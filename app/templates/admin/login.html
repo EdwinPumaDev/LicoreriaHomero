@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b080c">
+
+    <title>Iniciar sesión | Licorería Homero</title>
+
+    <style>
+        :root {
+            --fondo: #0b080c;
+            --bordo: #750d2a;
+            --bordo-claro: #a9173c;
+            --dorado: #e3bd72;
+            --texto: #f8f4f2;
+            --secundario: #aaa0ab;
+            --borde: rgba(255, 255, 255, 0.11);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: var(--texto);
+            background:
+                radial-gradient(ellipse at 15% 20%,
+                    rgba(117, 13, 42, .27), transparent 40%),
+                radial-gradient(ellipse at 90% 85%,
+                    rgba(177, 121, 39, .12), transparent 35%),
+                var(--fondo);
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        .login-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            max-width: 960px;
+            min-height: 570px;
+            overflow: hidden;
+            border: 1px solid var(--borde);
+            border-radius: 22px;
+            background: #111016;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, .5);
+        }
+
+        .brand-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            padding: 42px;
+            background:
+                radial-gradient(ellipse at 70% 35%,
+                    rgba(157, 53, 50, .27), transparent 45%),
+                linear-gradient(145deg, #400b1c, #210914 62%, #12090e);
+            border-right: 1px solid rgba(227, 189, 114, .2);
+        }
+
+        .brand-panel::before,
+        .brand-panel::after {
+            position: absolute;
+            content: "";
+            border: 1px solid rgba(227, 189, 114, .12);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .brand-panel::before {
+            width: 340px;
+            height: 340px;
+            right: -170px;
+            top: 80px;
+        }
+
+        .brand-panel::after {
+            width: 250px;
+            height: 250px;
+            right: -125px;
+            top: 125px;
+        }
+
+        .brand,
+        .brand-message,
+        .brand-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-symbol {
+            display: grid;
+            place-items: center;
+            width: 58px;
+            height: 58px;
+            border: 1px solid var(--dorado);
+            border-radius: 15px;
+            color: var(--dorado);
+            font-size: 30px;
+        }
+
+        .brand-name {
+            color: var(--dorado);
+            font-family: Georgia, serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .brand-subtitle {
+            margin-top: 7px;
+            color: #d2bda5;
+            font-size: 10px;
+            letter-spacing: 2.5px;
+        }
+
+        .eyebrow {
+            color: var(--dorado);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .brand-message h1 {
+            max-width: 360px;
+            margin: 20px 0;
+            font-family: Georgia, serif;
+            font-size: clamp(32px, 4vw, 43px);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        .brand-message h1 span {
+            color: var(--dorado);
+        }
+
+        .brand-message p {
+            max-width: 330px;
+            color: #d1c2ca;
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .brand-footer {
+            padding-top: 20px;
+            border-top: 1px solid rgba(227, 189, 114, .2);
+            color: #b9a6b1;
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .mobile-brand {
+            display: none;
+        }
+
+        .form-panel h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 650;
+        }
+
+        .form-description {
+            margin: 12px 0 30px;
+            color: var(--secundario);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .flash-message {
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border: 1px solid #8f3547;
+            border-radius: 9px;
+            background: rgba(169, 23, 60, .15);
+            color: #ffbac6;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .flash-message.success {
+            border-color: #276a51;
+            background: rgba(38, 138, 94, .13);
+            color: #9de6c4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #e9e1e9;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            min-height: 49px;
+            padding: 13px 14px;
+            border: 1px solid #34303b;
+            border-radius: 9px;
+            outline: none;
+            background: #191720;
+            color: white;
+            font: inherit;
+            font-size: 13px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #77717f;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--dorado);
+            box-shadow: 0 0 0 3px rgba(227, 189, 114, .1);
+        }
+
+        .password-input {
+            padding-right: 72px !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            padding: 5px;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--dorado);
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 49px;
+            margin-top: 8px;
+            border: 1px solid #c28b48;
+            border-radius: 9px;
+            background: linear-gradient(105deg, #8c1231, #671027);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s, filter .2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(117, 13, 42, .3);
+            filter: brightness(1.15);
+        }
+
+        .login-button:focus-visible,
+        .toggle-password:focus-visible {
+            outline: 2px solid var(--dorado);
+            outline-offset: 3px;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 26px;
+            padding: 14px;
+            border: 1px solid var(--borde);
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .025);
+            color: var(--secundario);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .security-icon {
+            color: var(--dorado);
+            font-size: 17px;
+        }
+
+        .bottom-note {
+            margin-top: 30px;
+            color: #77717f;
+            font-size: 10px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-layout {
+                grid-template-columns: 1fr;
+                max-width: 460px;
+                min-height: auto;
+            }
+
+            .brand-panel {
+                display: none;
+            }
+
+            .form-panel {
+                padding: 34px 25px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 35px;
+            }
+
+            .mobile-brand .brand-symbol {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+            }
+
+            .mobile-brand .brand-name {
+                font-size: 16px;
+            }
+
+            .form-panel h2 {
+                font-size: 25px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-layout">
+
+        <section class="brand-panel">
+            <div class="brand">
+                <div class="brand-symbol" aria-hidden="true">♜</div>
+                <div>
+                    <div class="brand-name">LICORERÍA HOMERO</div>
+                    <div class="brand-subtitle">CALIDAD Y VARIEDAD</div>
+                </div>
+            </div>
+
+            <div class="brand-message">
+                <div class="eyebrow">PANEL DE ADMINISTRACIÓN</div>
+                <h1>Tu negocio,<br><span>bajo control.</span></h1>
+                <p>
+                    Gestiona tus productos, organiza tu inventario
+                    y administra tu negocio desde un solo lugar.
+                </p>
+            </div>
+
+            <div class="brand-footer">
+                Calidad, variedad y buenos momentos.<br>
+                © <span id="brandYear"></span> Licorería Homero
+            </div>
+        </section>
+
+        <section class="form-panel">
+            <div class="mobile-brand">
+                <div class="brand-symbol" aria-hidden="true">♜</div>
+                <div>
+                    <div class="brand-name">LICORERÍA HOMERO</div>
+                    <div class="brand-subtitle">PANEL PRIVADO</div>
+                </div>
+            </div>
+
+            <div class="eyebrow">BIENVENIDO DE NUEVO</div>
+            <h2>Iniciar sesión</h2>
+            <p class="form-description">
+                Ingresa tus credenciales para acceder al panel privado.
+            </p>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+                    <div
+                        class="flash-message {% if categoria == 'success' %}success{% endif %}"
+                        role="alert"
+                    >
+                        {{ mensaje }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('admin.login') }}">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <div class="form-group">
+                    <label for="username">Nombre de usuario</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Escribe tu usuario"
+                            autocomplete="username"
+                            maxlength="50"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input
+                            class="password-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Escribe tu contraseña"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button
+                            class="toggle-password"
+                            type="button"
+                            id="togglePassword"
+                            aria-controls="password"
+                            aria-label="Mostrar contraseña"
+                            aria-pressed="false"
+                        >
+                            Mostrar
+                        </button>
+                    </div>
+                </div>
+
+                <button class="login-button" type="submit">
+                    <span>Iniciar sesión</span>
+                    <span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <div class="security-note">
+                <span class="security-icon" aria-hidden="true">♢</span>
+                <span>
+                    <strong>Acceso protegido</strong><br>
+                    Esta sección está reservada para usuarios autorizados.
+                    No compartas tus credenciales.
+                </span>
+            </div>
+
+            <div class="bottom-note">
+                Licorería Homero · Sistema de gestión privado
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById("brandYear").textContent =
+            new Date().getFullYear();
+
+        const passwordInput = document.getElementById("password");
+        const toggleButton = document.getElementById("togglePassword");
+
+        toggleButton.addEventListener("click", () => {
+            const mostrar = passwordInput.type === "password";
+
+            passwordInput.type = mostrar ? "text" : "password";
+            toggleButton.textContent = mostrar ? "Ocultar" : "Mostrar";
+            toggleButton.setAttribute("aria-pressed", String(mostrar));
+            toggleButton.setAttribute(
+                "aria-label",
+                mostrar ? "Ocultar contraseña" : "Mostrar contraseña"
+            );
+        });
+    </script>
+</body>
+</html>
