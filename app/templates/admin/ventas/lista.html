@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas | Licorería Homero</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .ventas-contenido { padding: 32px; }
+        .ventas-cabecera {
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 16px; flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .ventas-cabecera h1 { margin: 0 0 8px; }
+        .ventas-subtitulo { color: #aaaab8; }
+        .tabla-contenedor {
+            overflow-x: auto; border: 1px solid #30303a;
+            border-radius: 12px; background: #111117;
+        }
+        .tabla-ventas {
+            width: 100%; border-collapse: collapse;
+            min-width: 650px;
+        }
+        .tabla-ventas th, .tabla-ventas td {
+            padding: 16px; text-align: left;
+            border-bottom: 1px solid #292933;
+        }
+        .tabla-ventas th { color: #d9b56d; font-size: 13px; }
+        .tabla-ventas td { color: #eeeeF4; }
+        .estado {
+            display: inline-block; padding: 5px 10px;
+            border-radius: 20px; background: #173b2a;
+            color: #8fe0ae; font-size: 12px;
+        }
+        .boton-principal {
+            display: inline-block; padding: 12px 18px;
+            border-radius: 8px; background: #7d2435;
+            color: white; text-decoration: none; font-weight: 600;
+        }
+        .tabla-vacia { text-align: center !important; padding: 40px !important; color: #aaaab8 !important; }
+        @media (max-width: 700px) {
+            .ventas-contenido { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('admin.dashboard') }}" class="brand">
+            <span class="brand-symbol">✦</span>
+            <span class="brand-name">
+                LICORERÍA
+                <span style="display:block">HOMERO</span>
+                <span class="brand-subtitle">CALIDAD Y VARIEDAD</span>
+            </span>
+        </a>
+
+        <p class="nav-label">MENÚ PRINCIPAL</p>
+        <nav class="nav-menu">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">⌂ Inicio</a>
+            <a class="nav-link" href="{{ url_for('admin.lista_productos') }}">◇ Productos</a>
+            <a class="nav-link active" href="{{ url_for('admin.lista_ventas') }}">🛒 Ventas</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form class="logout-form" method="POST"
+                  action="{{ url_for('admin.logout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="nav-link logout-button" type="submit">
+                    ⇥ Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section class="ventas-contenido">
+            <div class="ventas-cabecera">
+                <div>
+                    <h1>Historial de ventas</h1>
+                    <p class="ventas-subtitulo">
+                        Consulta las operaciones registradas en Licorería Homero.
+                    </p>
+                </div>
+                <a class="boton-principal"
+                   href="{{ url_for('admin.nueva_venta') }}">
+                    + Nueva venta
+                </a>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table class="tabla-ventas">
+                    <thead>
+                        <tr>
+                            <th>N.º de venta</th>
+                            <th>Fecha</th>
+                            <th>Usuario</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for venta in ventas %}
+                        <tr>
+                            <td>{{ venta.numero }}</td>
+                            <td>{{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ venta.usuario.username }}</td>
+                            <td>Bs {{ "%.2f"|format(venta.total) }}</td>
+                            <td><span class="estado">{{ venta.estado|capitalize }}</span></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="tabla-vacia">
+                                Todavía no hay ventas registradas.
+                                <br><br>
+                                Cuando registres la primera, aparecerá aquí.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

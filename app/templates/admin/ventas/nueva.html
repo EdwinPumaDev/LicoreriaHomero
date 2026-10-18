@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva venta | Licorería Homero</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin.css') }}">
+
+    <style>
+        .ventas-contenido {
+            padding: 32px;
+            max-width: 1100px;
+        }
+
+        .ventas-cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .ventas-cabecera h1 {
+            margin: 0 0 8px;
+        }
+
+        .descripcion {
+            color: #aaaab8;
+            margin: 0;
+        }
+
+        .panel {
+            background: #111117;
+            border: 1px solid #30303a;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 580px;
+        }
+
+        .tabla-productos th,
+        .tabla-productos td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #292933;
+        }
+
+        .tabla-productos th {
+            color: #d9b56d;
+            font-size: 13px;
+        }
+
+        .tabla-productos td {
+            color: #eeeef4;
+        }
+
+        .cantidad {
+            width: 90px;
+            padding: 10px;
+            color: #fff;
+            background: #1b1b24;
+            border: 1px solid #454552;
+            border-radius: 7px;
+        }
+
+        .campo-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d9b56d;
+            font-weight: 600;
+        }
+
+        .observaciones {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 90px;
+            padding: 12px;
+            color: #fff;
+            background: #1b1b24;
+            border: 1px solid #454552;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .resumen {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .total-label {
+            color: #aaaab8;
+        }
+
+        .total-valor {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e4c47b;
+        }
+
+        .boton {
+            display: inline-block;
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .boton-principal {
+            background: #7d2435;
+        }
+
+        .boton-secundario {
+            background: transparent;
+            border: 1px solid #494954;
+        }
+
+        .mensajes {
+            margin-bottom: 18px;
+        }
+
+        .mensaje {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #28232b;
+            color: #f3e4c7;
+        }
+
+        .mensaje.success {
+            background: #173b2a;
+            color: #a8edbe;
+        }
+
+        .mensaje.danger,
+        .mensaje.error {
+            background: #481f29;
+            color: #ffc2ca;
+        }
+
+        .sin-productos {
+            color: #aaaab8;
+            padding: 20px 0;
+        }
+
+        @media (max-width: 700px) {
+            .ventas-contenido {
+                padding: 18px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('admin.dashboard') }}" class="brand">
+            <span class="brand-symbol">✦</span>
+            <span class="brand-name">
+                LICORERÍA
+                <span style="display:block">HOMERO</span>
+                <span class="brand-subtitle">CALIDAD Y VARIEDAD</span>
+            </span>
+        </a>
+
+        <p class="nav-label">MENÚ PRINCIPAL</p>
+        <nav class="nav-menu">
+            <a class="nav-link"
+               href="{{ url_for('admin.dashboard') }}">⌂ Inicio</a>
+            <a class="nav-link"
+               href="{{ url_for('admin.lista_productos') }}">◇ Productos</a>
+            <a class="nav-link active"
+               href="{{ url_for('admin.lista_ventas') }}">🛒 Ventas</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <form class="logout-form" method="POST"
+                  action="{{ url_for('admin.logout') }}">
+                <input type="hidden" name="csrf_token"
+                       value="{{ csrf_token() }}">
+                <button class="nav-link logout-button" type="submit">
+                    ⇥ Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section class="ventas-contenido">
+            <div class="ventas-cabecera">
+                <div>
+                    <h1>Nueva venta</h1>
+                    <p class="descripcion">
+                        Selecciona los productos y las cantidades.
+                    </p>
+                </div>
+
+                <a class="boton boton-secundario"
+                   href="{{ url_for('admin.lista_ventas') }}">
+                    ← Historial
+                </a>
+            </div>
+
+            <div class="mensajes">
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="mensaje {{ categoria }}">
+                            {{ mensaje }}
+                        </div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('admin.nueva_venta') }}"
+                  id="formulario-venta">
+
+                <input type="hidden" name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <section class="panel">
+                    <h2>Productos disponibles</h2>
+                    <p class="descripcion">
+                        Introduce la cantidad que deseas vender.
+                        Deja cero en los productos que no utilizarás.
+                    </p>
+
+                    {% if productos %}
+                        <div class="tabla-contenedor">
+                            <table class="tabla-productos">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Producto</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Cantidad</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for producto in productos %}
+                                    <tr data-producto
+                                        data-precio="{{ producto.precio_venta }}">
+                                        <td>{{ producto.codigo }}</td>
+                                        <td>{{ producto.nombre }}</td>
+                                        <td>
+                                            Bs {{ "%.2f"|format(producto.precio_venta) }}
+                                        </td>
+                                        <td>{{ producto.stock }}</td>
+                                        <td>
+                                            <input
+                                                class="cantidad"
+                                                type="number"
+                                                name="cantidad_{{ producto.id }}"
+                                                min="0"
+                                                max="{{ producto.stock }}"
+                                                step="1"
+                                                value="0"
+                                                inputmode="numeric"
+                                                aria-label="Cantidad de {{ producto.nombre }}">
+                                        </td>
+                                        <td class="subtotal">Bs 0.00</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="sin-productos">
+                            No hay productos activos con existencias disponibles.
+                            Registra productos o repón el inventario antes de vender.
+                        </p>
+                    {% endif %}
+                </section>
+
+                <section class="panel">
+                    <label class="campo-label" for="observaciones">
+                        Observaciones (opcional)
+                    </label>
+                    <textarea
+                        class="observaciones"
+                        id="observaciones"
+                        name="observaciones"
+                        maxlength="500"
+                        placeholder="Nota de la venta, si es necesaria..."></textarea>
+                </section>
+
+                <section class="panel resumen">
+                    <div>
+                        <div class="total-label">Total estimado</div>
+                        <div class="total-valor" id="total-venta">Bs 0.00</div>
+                        <p class="descripcion">
+                            El importe definitivo se calcula en el servidor.
+                        </p>
+                    </div>
+
+                    <button class="boton boton-principal"
+                            type="submit"
+                            {% if not productos %}disabled{% endif %}
+                            onclick="return confirm('¿Confirmas el registro de esta venta?');">
+                        Confirmar venta
+                    </button>
+                </section>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+(function () {
+    const filas = document.querySelectorAll("[data-producto]");
+    const totalElemento = document.getElementById("total-venta");
+
+    function actualizarTotal() {
+        let total = 0;
+
+        filas.forEach(function (fila) {
+            const entrada = fila.querySelector(".cantidad");
+            const precio = Number(fila.dataset.precio);
+            let cantidad = Number(entrada.value);
+
+            if (!Number.isInteger(cantidad) || cantidad < 0) {
+                cantidad = 0;
+            }
+
+            const maximo = Number(entrada.max);
+            if (cantidad > maximo) {
+                cantidad = maximo;
+            }
+
+            const subtotal = Math.round(precio * cantidad * 100) / 100;
+            fila.querySelector(".subtotal").textContent =
+                "Bs " + subtotal.toFixed(2);
+
+            total += subtotal;
+        });
+
+        totalElemento.textContent =
+            "Bs " + (Math.round(total * 100) / 100).toFixed(2);
+    }
+
+    filas.forEach(function (fila) {
+        fila.querySelector(".cantidad").addEventListener(
+            "input",
+            actualizarTotal
+        );
+    });
+
+    document.getElementById("formulario-venta").addEventListener(
+        "submit",
+        function (evento) {
+            let seleccionados = 0;
+            let invalido = false;
+
+            filas.forEach(function (fila) {
+                const entrada = fila.querySelector(".cantidad");
+                const cantidad = Number(entrada.value);
+                const maximo = Number(entrada.max);
+
+                if (
+                    !Number.isInteger(cantidad) ||
+                    cantidad < 0 ||
+                    cantidad > maximo
+                ) {
+                    invalido = true;
+                }
+
+                if (cantidad > 0) {
+                    seleccionados++;
+                }
+            });
+
+            if (invalido || seleccionados === 0) {
+                evento.preventDefault();
+                alert(
+                    invalido
+                        ? "Revisa las cantidades y el stock disponible."
+                        : "Selecciona al menos un producto."
+                );
+            }
+        }
+    );
+
+    actualizarTotal();
+})();
+</script>
+</body>
+</html>

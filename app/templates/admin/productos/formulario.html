@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Nuevo producto" if modo == "nuevo" else "Editar producto" }} | Licorería Homero</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .form-card { max-width: 950px; margin: auto; }
+        .product-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+        .field { display: flex; flex-direction: column; gap: 8px; }
+        .field label { color: #e9e1e9; font-size: 12px; font-weight: 600; }
+        .field input, .field textarea { min-height: 44px; }
+        .field textarea { min-height: 110px; resize: vertical; }
+        .field.full { grid-column: 1 / -1; }
+        .form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .btn { display: inline-flex; justify-content: center; padding: 12px 17px; border: 1px solid #8d1837; border-radius: 9px; background: #720d27; color: white; cursor: pointer; font: inherit; text-decoration: none; }
+        .btn-secondary { background: #20202a; border-color: #393542; }
+        .alert { margin: 12px 0; padding: 12px; border-radius: 9px; background: #191720; }
+        .alert.danger { color: #ff9baa; }
+        .alert.warning { color: #f3c45c; }
+        .alert.success { color: #8de3b8; }
+        @media (max-width: 650px) { .product-form { grid-template-columns: 1fr; } .field.full { grid-column: auto; } }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('admin.dashboard') }}" class="brand">
+            <span class="brand-symbol">♜</span>
+            <span class="brand-name">LICORERÍA <span style="display:block">HOMERO</span>
+                <span class="brand-subtitle">CALIDAD Y VARIEDAD</span>
+            </span>
+        </a>
+        <p class="nav-label">MENÚ PRINCIPAL</p>
+        <nav class="nav-menu">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}"><span class="nav-icon">⌂</span> Inicio</a>
+            <a class="nav-link active" href="{{ url_for('admin.lista_productos') }}"><span class="nav-icon">◇</span> Productos</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <form class="logout-form" method="POST" action="{{ url_for('admin.logout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="nav-link logout-button" type="submit"><span class="nav-icon">⇥</span> Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <header class="topbar">
+            <div>
+                <strong>{{ "Registrar producto" if modo == "nuevo" else "Editar producto" }}</strong>
+                <div class="profile-role">Licorería Homero / Productos</div>
+            </div>
+            <div class="topbar-spacer"></div>
+            <a class="btn btn-secondary" href="{{ url_for('admin.lista_productos') }}">Volver al catálogo</a>
+        </header>
+
+        <main class="content">
+            <section class="welcome-banner">
+                <div>
+                    <p class="eyebrow">GESTIÓN DEL CATÁLOGO</p>
+                    <h1>{{ "Nuevo producto" if modo == "nuevo" else "Editar producto" }}</h1>
+                    <p class="welcome-description">Completa los datos para mantener actualizado tu inventario.</p>
+                </div>
+            </section>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+                    <div class="alert {{ categoria }}" role="alert">{{ mensaje }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <section class="panel form-card">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="product-form">
+                        <div class="field">
+                            <label for="codigo">Código *</label>
+                            <input id="codigo" name="codigo" maxlength="50" required value="{{ producto.codigo if producto else '' }}" placeholder="Ej.: BEB-001">
+                        </div>
+
+                        <div class="field">
+                            <label for="nombre">Nombre del producto *</label>
+                            <input id="nombre" name="nombre" maxlength="150" required value="{{ producto.nombre if producto else '' }}" placeholder="Nombre del producto">
+                        </div>
+
+                        <div class="field">
+                            <label for="categoria">Categoría *</label>
+                            <input id="categoria" name="categoria" maxlength="100" required list="categorias" value="{{ producto.categoria if producto else '' }}" placeholder="Ej.: Cervezas">
+                            <datalist id="categorias">
+                                <option value="Cervezas">
+                                <option value="Whiskys">
+                                <option value="Vinos">
+                                <option value="Vodkas">
+                                <option value="Rones">
+                                <option value="Gaseosas">
+                                <option value="Dulces">
+                                <option value="Salados">
+                                <option value="Cigarros">
+                                <option value="Otros">
+                            </datalist>
+                        </div>
+
+                        <div class="field">
+                            <label for="marca">Marca</label>
+                            <input id="marca" name="marca" maxlength="100" value="{{ producto.marca if producto else '' }}" placeholder="Marca del producto">
+                        </div>
+
+                        <div class="field">
+                            <label for="costo">Costo de compra (Bs) *</label>
+                            <input id="costo" name="costo" type="number" min="0" max="99999999.99" step="0.01" required value="{{ producto.costo if producto else '' }}" placeholder="0.00">
+                        </div>
+
+                        <div class="field">
+                            <label for="precio_venta">Precio de venta (Bs) *</label>
+                            <input id="precio_venta" name="precio_venta" type="number" min="0.01" max="99999999.99" step="0.01" required value="{{ producto.precio_venta if producto else '' }}" placeholder="0.00">
+                        </div>
+
+                        <div class="field">
+                            <label for="stock">Existencias actuales *</label>
+                            <input id="stock" name="stock" type="number" min="0" max="2147483647" step="1" required value="{{ producto.stock if producto else '0' }}">
+                        </div>
+
+                        <div class="field">
+                            <label for="stock_minimo">Stock mínimo *</label>
+                            <input id="stock_minimo" name="stock_minimo" type="number" min="0" max="2147483647" step="1" required value="{{ producto.stock_minimo if producto else '5' }}">
+                        </div>
+
+                        <div class="field full">
+                            <label for="descripcion">Descripción</label>
+                            <textarea id="descripcion" name="descripcion" placeholder="Detalles opcionales del producto">{{ producto.descripcion if producto else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn" type="submit">
+                            {{ "Guardar producto" if modo == "nuevo" else "Guardar cambios" }}
+                        </button>
+                        <a class="btn btn-secondary" href="{{ url_for('admin.lista_productos') }}">Cancelar</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>

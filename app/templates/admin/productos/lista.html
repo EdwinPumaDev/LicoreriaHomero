@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos | Licorería Homero</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .products-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin: 24px 0;
+        }
+        .products-search {
+            display: flex;
+            flex: 1;
+            gap: 8px;
+            min-width: 230px;
+        }
+        .products-search input, .field input, .field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #34303b;
+            border-radius: 9px;
+            background: #191720;
+            color: #f8f4f2;
+            font: inherit;
+        }
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 15px;
+            border: 1px solid #8d1837;
+            border-radius: 9px;
+            background: #720d27;
+            color: white;
+            cursor: pointer;
+            font: inherit;
+        }
+        .btn-secondary { background: #20202a; border-color: #393542; }
+        .btn-warning { background: #382713; border-color: #745322; color: #f3c45c; }
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            background: #14372c;
+            color: #6de0b4;
+        }
+        .status.inactive { background: #38202a; color: #ff9baa; }
+        .alert {
+            padding: 12px 14px;
+            margin: 12px 0;
+            border: 1px solid #3b3444;
+            border-radius: 9px;
+            background: #191720;
+        }
+        .alert.success { color: #8de3b8; }
+        .alert.danger { color: #ff9baa; }
+        .alert.warning { color: #f3c45c; }
+        .empty-state { padding: 32px 12px; text-align: center; color: #aaa0ab; }
+        .actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('admin.dashboard') }}" class="brand">
+            <span class="brand-symbol">♜</span>
+            <span class="brand-name">LICORERÍA <span style="display:block">HOMERO</span>
+                <span class="brand-subtitle">CALIDAD Y VARIEDAD</span>
+            </span>
+        </a>
+        <p class="nav-label">MENÚ PRINCIPAL</p>
+        <nav class="nav-menu">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}"><span class="nav-icon">⌂</span> Inicio</a>
+            <a class="nav-link active" href="{{ url_for('admin.lista_productos') }}"><span class="nav-icon">◇</span> Productos</a>
+        </nav>
+        <div class="sidebar-bottom">
+            <form class="logout-form" method="POST" action="{{ url_for('admin.logout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="nav-link logout-button" type="submit"><span class="nav-icon">⇥</span> Cerrar sesión</button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="main-area">
+        <header class="topbar">
+            <div>
+                <strong>Gestión de productos</strong>
+                <div class="profile-role">Licorería Homero / Catálogo</div>
+            </div>
+            <div class="topbar-spacer"></div>
+            <div class="profile">
+                <div class="profile-avatar">{{ current_user.nombre[:1]|upper }}</div>
+                <div class="profile-info">
+                    <div class="profile-name">{{ current_user.nombre }}</div>
+                    <div class="profile-role">Administrador</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="welcome-banner">
+                <div>
+                    <p class="eyebrow">CATÁLOGO E INVENTARIO</p>
+                    <h1>Productos</h1>
+                    <p class="welcome-description">Registra y organiza los productos de tu negocio.</p>
+                </div>
+                <div class="date-card">
+                    <strong>{{ productos|length }} resultados</strong>
+                    <span>Productos que coinciden con tu búsqueda.</span>
+                </div>
+            </section>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensaje in mensajes %}
+                    <div class="alert {{ categoria }}" role="alert">{{ mensaje }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <div class="products-toolbar">
+                <form class="products-search" method="GET" action="{{ url_for('admin.lista_productos') }}">
+                    <input type="search" name="q" value="{{ busqueda }}" placeholder="Buscar por código, nombre, marca o categoría" aria-label="Buscar productos">
+                    <button class="btn btn-secondary" type="submit">Buscar</button>
+                </form>
+                <a class="btn" href="{{ url_for('admin.nuevo_producto') }}">＋ Nuevo producto</a>
+            </div>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3>Catálogo registrado</h3>
+                        <div class="panel-subtitle">Los datos se consultan desde PostgreSQL.</div>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Costo</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.codigo }}</td>
+                                <td>
+                                    <strong>{{ producto.nombre }}</strong>
+                                    {% if producto.marca %}
+                                        <div class="product-meta">{{ producto.marca }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ producto.categoria }}</td>
+                                <td class="amount">Bs {{ "%.2f"|format(producto.costo) }}</td>
+                                <td class="amount">Bs {{ "%.2f"|format(producto.precio_venta) }}</td>
+                                <td>
+                                    {{ producto.stock }}
+                                    {% if producto.necesita_reposicion %}
+                                        <div class="product-meta" style="color:#ff9baa">Stock bajo</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status {% if not producto.activo %}inactive{% endif %}">
+                                        {{ "Activo" if producto.activo else "Inactivo" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <a class="btn btn-secondary" href="{{ url_for('admin.editar_producto', producto_id=producto.id) }}">Editar</a>
+                                        <form method="POST" action="{{ url_for('admin.cambiar_estado_producto', producto_id=producto.id) }}" onsubmit="return confirm('¿Deseas cambiar el estado de este producto?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button class="btn btn-warning" type="submit">
+                                                {{ "Desactivar" if producto.activo else "Activar" }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <h3>No hay productos registrados</h3>
+                                        <p>Agrega el primer producto para comenzar a organizar el inventario.</p>
+                                        <a class="btn" href="{{ url_for('admin.nuevo_producto') }}">Registrar producto</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+</body>
+</html>
