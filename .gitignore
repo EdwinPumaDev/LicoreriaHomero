@@ -1,0 +1,30 @@
+
+# Entorno virtual de Python
+.venv/
+venv/
+
+# Variables de entorno y contraseñas
+.env
+.env.*
+
+# Permitir únicamente el archivo de ejemplo
+!.env.example
+
+# Archivos generados por Python
+__pycache__/
+*.py[cod]
+
+# Archivos generados por Django
+staticfiles/
+media/
+
+# Configuración local de editores
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
