@@ -1,0 +1,82 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | Licorería Homero</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+    <main class="login-page">
+        <section class="login-brand">
+            <div class="brand-icon">H</div>
+            <p class="eyebrow">SISTEMA DE GESTIÓN</p>
+            <h1>Licorería<br>Homero</h1>
+            <p class="brand-description">
+                Controla tus productos, administra tus ventas
+                y organiza tu negocio desde un solo lugar.
+            </p>
+            <div class="brand-footer">Gestión simple. Control total.</div>
+        </section>
+
+        <section class="login-panel">
+            <div class="login-form-wrapper">
+                <div class="mobile-brand">H · LICORERÍA HOMERO</div>
+                <p class="form-eyebrow">BIENVENIDO DE NUEVO</p>
+                <h2>Iniciar sesión</h2>
+                <p class="form-description">
+                    Introduce tus credenciales para continuar.
+                </p>
+
+                {% if form.errors %}
+                    <div class="error-message">
+                        Usuario o contraseña incorrectos. Inténtalo de nuevo.
+                    </div>
+                {% endif %}
+
+                {% if next and user.is_authenticated %}
+                    <div class="error-message">
+                        Tu cuenta no tiene permiso para acceder a esa página.
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="next" value="{{ next|default:'/dashboard/' }}">
+
+                    <label for="id_username">Usuario</label>
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        placeholder="Escribe tu usuario"
+                        autocomplete="username"
+                        required
+                        autofocus
+                    >
+
+                    <label for="id_password">Contraseña</label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        placeholder="Escribe tu contraseña"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button type="submit">Ingresar al sistema <span>→</span></button>
+                </form>
+
+                <p class="security-note">
+                    Acceso exclusivo para personal autorizado.
+                </p>
+                <p class="copyright">© 2026 Licorería Homero</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

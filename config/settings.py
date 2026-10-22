@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
-# Seguridad y entorno
+# Seguridad y configuración del entorno
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
     "django-insecure-solo-desarrollo-cambiar-en-produccion",
@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
+    # Aplicaciones internas de Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -34,8 +35,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Aplicaciones propias de Licorería Homero
+    # Aplicaciones de Licorería Homero
     "apps.usuarios.apps.UsuariosConfig",
+    "apps.productos.apps.ProductosConfig",
+    "apps.inventario.apps.InventarioConfig",
+    "apps.proveedores.apps.ProveedoresConfig",
+    "apps.compras.apps.ComprasConfig",
+    "apps.ventas.apps.VentasConfig",
+    "apps.caja.apps.CajaConfig",
+    "apps.reportes.apps.ReportesConfig",
 ]
 
 # Middleware
@@ -49,7 +57,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Rutas principales
+# Configuración de rutas
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -70,7 +78,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Base de datos PostgreSQL
+# Conexión a PostgreSQL
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -112,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Idioma y horario
+# Idioma y zona horaria de Bolivia
 LANGUAGE_CODE = "es-bo"
 TIME_ZONE = "America/La_Paz"
 USE_I18N = True
@@ -123,23 +131,24 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Fotografías y archivos subidos
+# Archivos multimedia: fotografías de productos y otros documentos
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Valores predeterminados
+# Clave primaria predeterminada
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Navegación y autenticación
+# Autenticación y navegación
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "dashboard"
 LOGOUT_REDIRECT_URL = "login"
 
-# Seguridad de sesiones y formularios
+# Protección de sesiones y formularios
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = "DENY"
 
+# Seguridad adicional para producción con HTTPS
 if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True

@@ -28,3 +28,7 @@ media/
 # Archivos del sistema operativo
 Thumbs.db
 .DS_Store
+
+# Base de datos local de SQLite
+db.sqlite3
+

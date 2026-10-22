@@ -1,0 +1,244 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --wine: #651b2b;
+    --wine-dark: #35101b;
+    --gold: #d7b778;
+    --ink: #28232a;
+    --muted: #89838d;
+    --border: #e8e3e7;
+    --background: #faf8f7;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    background: var(--background);
+}
+
+.login-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+}
+
+.login-brand {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10% 13%;
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(ellipse at 15% 85%, #7e3441 0%, transparent 45%),
+        linear-gradient(145deg, #511421, #270b15 85%);
+}
+
+.login-brand::after {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    right: -210px;
+    top: -150px;
+    border: 1px solid rgb(215 183 120 / 20%);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 45px rgb(215 183 120 / 5%),
+        0 0 0 90px rgb(215 183 120 / 4%);
+}
+
+.brand-icon {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 44px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font: 800 34px 'Manrope', sans-serif;
+    border-radius: 18px;
+}
+
+.eyebrow,
+.form-eyebrow {
+    margin: 0 0 15px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.eyebrow {
+    color: var(--gold);
+}
+
+.login-brand h1 {
+    margin: 0;
+    font: 800 clamp(42px, 5vw, 70px)/1.08 'Manrope', sans-serif;
+    letter-spacing: -3px;
+}
+
+.brand-description {
+    max-width: 390px;
+    margin-top: 26px;
+    color: #e0cfd2;
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.brand-footer {
+    margin-top: 54px;
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
+.login-panel {
+    display: grid;
+    place-items: center;
+    padding: 48px 30px;
+    background: #fff;
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 390px;
+}
+
+.mobile-brand {
+    display: none;
+}
+
+.form-eyebrow {
+    color: var(--wine);
+}
+
+.login-form-wrapper h2 {
+    margin: 0;
+    font: 800 34px 'Manrope', sans-serif;
+    letter-spacing: -1px;
+}
+
+.form-description {
+    margin: 12px 0 32px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.login-form-wrapper form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form-wrapper label {
+    margin: 0 0 9px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.login-form-wrapper input {
+    width: 100%;
+    height: 49px;
+    margin-bottom: 22px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    outline: none;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.login-form-wrapper input:focus {
+    border-color: var(--wine);
+    box-shadow: 0 0 0 3px rgb(101 27 43 / 9%);
+}
+
+.login-form-wrapper input::placeholder {
+    color: #aaa4ac;
+}
+
+.login-form-wrapper button {
+    height: 51px;
+    margin-top: 4px;
+    border: none;
+    border-radius: 9px;
+    background: var(--wine);
+    color: #fff;
+    font: 700 14px 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+
+.login-form-wrapper button:hover {
+    background: var(--wine-dark);
+    transform: translateY(-1px);
+}
+
+.login-form-wrapper button span {
+    margin-left: 10px;
+    color: var(--gold);
+}
+
+.security-note {
+    margin-top: 26px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.copyright {
+    margin-top: 44px;
+    color: #aaa4ac;
+    font-size: 11px;
+    text-align: center;
+}
+
+.error-message {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid #efcaca;
+    border-radius: 8px;
+    background: #fff3f3;
+    color: #982b35;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+    .login-page {
+        grid-template-columns: 1fr;
+    }
+
+    .login-brand {
+        display: none;
+    }
+
+    .login-panel {
+        min-height: 100vh;
+        padding: 32px 24px;
+    }
+
+    .mobile-brand {
+        display: block;
+        margin-bottom: 55px;
+        color: var(--wine);
+        font: 800 12px 'Manrope', sans-serif;
+        letter-spacing: 1.5px;
+    }
+
+    .login-form-wrapper h2 {
+        font-size: 30px;
+    }
+}
