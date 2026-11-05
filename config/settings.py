@@ -8,7 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
-# Seguridad y configuración del entorno
+
+# ==========================================================
+# SEGURIDAD Y CONFIGURACIÓN DEL ENTORNO
+# ==========================================================
+
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
     "django-insecure-solo-desarrollo-cambiar-en-produccion",
@@ -25,7 +29,14 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-# Aplicaciones instaladas
+if DEBUG and "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
+
+
+# ==========================================================
+# APLICACIONES INSTALADAS
+# ==========================================================
+
 INSTALLED_APPS = [
     # Aplicaciones internas de Django
     "django.contrib.admin",
@@ -46,7 +57,11 @@ INSTALLED_APPS = [
     "apps.reportes.apps.ReportesConfig",
 ]
 
-# Middleware
+
+# ==========================================================
+# MIDDLEWARE
+# ==========================================================
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -57,7 +72,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Configuración de rutas
+
+# ==========================================================
+# CONFIGURACIÓN DE RUTAS Y PLANTILLAS
+# ==========================================================
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -78,7 +97,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Conexión a PostgreSQL
+
+# ==========================================================
+# CONEXIÓN A POSTGRESQL
+# ==========================================================
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -91,7 +114,11 @@ DATABASES = {
     }
 }
 
-# Validación de contraseñas
+
+# ==========================================================
+# VALIDACIÓN DE CONTRASEÑAS
+# ==========================================================
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
@@ -120,35 +147,75 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Idioma y zona horaria de Bolivia
-LANGUAGE_CODE = "es-bo"
+
+# ==========================================================
+# IDIOMA Y ZONA HORARIA
+# ==========================================================
+
+LANGUAGE_CODE = "es"
+
 TIME_ZONE = "America/La_Paz"
+
 USE_I18N = True
+
 USE_TZ = True
 
-# Archivos estáticos
+
+# ==========================================================
+# ARCHIVOS ESTÁTICOS
+# ==========================================================
+
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Archivos multimedia: fotografías de productos y otros documentos
+
+# ==========================================================
+# ARCHIVOS MULTIMEDIA
+# ==========================================================
+
 MEDIA_URL = "media/"
+
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Clave primaria predeterminada
+
+# ==========================================================
+# CLAVE PRIMARIA PREDETERMINADA
+# ==========================================================
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Autenticación y navegación
+
+# ==========================================================
+# AUTENTICACIÓN Y NAVEGACIÓN
+# ==========================================================
+
 LOGIN_URL = "login"
+
 LOGIN_REDIRECT_URL = "dashboard"
+
 LOGOUT_REDIRECT_URL = "login"
 
-# Protección de sesiones y formularios
+
+# ==========================================================
+# PROTECCIÓN DE SESIONES Y FORMULARIOS
+# ==========================================================
+
 SESSION_COOKIE_HTTPONLY = True
+
 CSRF_COOKIE_HTTPONLY = True
+
 X_FRAME_OPTIONS = "DENY"
 
-# Seguridad adicional para producción con HTTPS
+
+# ==========================================================
+# SEGURIDAD ADICIONAL PARA PRODUCCIÓN
+# ==========================================================
+
 if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SESSION_COOKIE_SECURE = True

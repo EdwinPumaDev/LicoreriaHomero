@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Compra #{{ compra.id }} | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}LICORERÍA HOMERO / <a href="{% url 'compras:lista' %}" style="color: inherit;">COMPRAS</a> / <strong>COMPRA #{{ compra.id }}</strong>{% endblock %}
+
+{% block page_title %}Detalle de Compra #{{ compra.id }}{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <div>
+        <p style="margin: 0; color: var(--muted); font-size: 13px;">
+            Registrada el {{ compra.fecha|date:"d/m/Y \a \l\a\s H:i" }} por {{ compra.usuario.get_full_name|default:compra.usuario.username }}
+        </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="window.print()" class="btn btn-secondary">
+            🖨️ Imprimir
+        </button>
+        <a href="{% url 'compras:lista' %}" class="btn btn-secondary">
+            ← Volver al listado
+        </a>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom: 22px;">
+    <!-- Tarjeta de Proveedor -->
+    <div class="form-card" style="margin-bottom: 0;">
+        <div class="form-card-header">
+            <h3>Información del Proveedor</h3>
+            <p>Datos de la empresa proveedora</p>
+        </div>
+        <div style="display: grid; gap: 10px; font-size: 13px;">
+            <div>
+                <strong style="color: var(--muted); font-size: 11px; display: block;">PROVEEDOR:</strong>
+                <span style="font-weight: 700; font-size: 14px;">{{ compra.proveedor.nombre }}</span>
+            </div>
+            <div class="grid-2">
+                <div>
+                    <strong style="color: var(--muted); font-size: 11px; display: block;">NIT:</strong>
+                    <code>{{ compra.proveedor.nit|default:"Sin NIT" }}</code>
+                </div>
+                <div>
+                    <strong style="color: var(--muted); font-size: 11px; display: block;">TELÉFONO:</strong>
+                    <span>{{ compra.proveedor.telefono|default:"No registrado" }}</span>
+                </div>
+            </div>
+            <div>
+                <strong style="color: var(--muted); font-size: 11px; display: block;">DIRECCIÓN:</strong>
+                <span>{{ compra.proveedor.direccion|default:"No registrada" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta del Comprobante y Estado -->
+    <div class="form-card" style="margin-bottom: 0;">
+        <div class="form-card-header">
+            <h3>Estado y Comprobante</h3>
+            <p>Control de ingreso al almacén</p>
+        </div>
+        <div style="display: grid; gap: 10px; font-size: 13px;">
+            <div class="grid-2">
+                <div>
+                    <strong style="color: var(--muted); font-size: 11px; display: block;">ESTADO ACTUAL:</strong>
+                    {% if compra.estado == "CONFIRMADA" %}
+                        <span class="badge badge-success" style="font-size: 12px; margin-top: 4px;">✓ Confirmada en Stock</span>
+                    {% elif compra.estado == "BORRADOR" %}
+                        <span class="badge badge-warning" style="font-size: 12px; margin-top: 4px;">▤ Borrador</span>
+                    {% else %}
+                        <span class="badge badge-danger" style="font-size: 12px; margin-top: 4px;">✕ Anulada</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <strong style="color: var(--muted); font-size: 11px; display: block;">N.º COMPROBANTE:</strong>
+                    <code>{{ compra.numero_comprobante|default:"Sin comprobante fiscal" }}</code>
+                </div>
+            </div>
+            <div>
+                <strong style="color: var(--muted); font-size: 11px; display: block;">OBSERVACIONES:</strong>
+                <p style="margin: 3px 0 0; color: #4e4752; font-size: 12px; white-space: pre-line;">
+                    {{ compra.observaciones|default:"Sin observaciones registradas." }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Productos del Detalle -->
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Productos Adquiridos</h2>
+            <p>{{ compra.detalles.count }} ítem(s) en esta compra</p>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>PRODUCTO</th>
+                    <th>UNIDAD</th>
+                    <th>CANTIDAD</th>
+                    <th>COSTO UNITARIO</th>
+                    <th style="text-align: right;">SUBTOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in compra.detalles.all %}
+                    <tr>
+                        <td>
+                            <strong>{{ d.producto.nombre }}</strong>
+                            <small style="display: block; color: var(--muted);">Cód: {{ d.producto.codigo }}</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-muted">{{ d.producto.get_unidad_medida_display }}</span>
+                        </td>
+                        <td>
+                            <strong style="font-size: 13px;">{{ d.cantidad }}</strong>
+                        </td>
+                        <td>
+                            <span>Bs {{ d.costo_unitario|floatformat:2 }}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <strong class="price-tag">Bs {{ d.subtotal|floatformat:2 }}</strong>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="text-align: right; font-weight: 700; padding: 18px 20px; font-size: 14px;">
+                        TOTAL DE LA COMPRA:
+                    </td>
+                    <td style="text-align: right; padding: 18px 20px;">
+                        <strong style="font-size: 20px; color: var(--wine-dark); font-family: 'Manrope', sans-serif;">
+                            Bs {{ compra.total|floatformat:2 }}
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</section>
+
+<!-- Panel de Acciones según Estado -->
+<div class="form-card" style="margin-top: 22px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <strong style="font-size: 13px;">Acciones de Gestión de Inventario</strong>
+            <p style="margin: 3px 0 0; color: var(--muted); font-size: 12px;">
+                {% if compra.estado == "BORRADOR" %}
+                    Esta compra aún no ha incrementado las existencias de los productos en almacén.
+                {% elif compra.estado == "CONFIRMADA" %}
+                    El stock fue aumentado en inventario y registrado en el Kardex.
+                {% else %}
+                    Esta compra fue anulada y el stock fue revertido.
+                {% endif %}
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+            {% if compra.estado == "BORRADOR" %}
+                <form method="post" action="{% url 'compras:confirmar' compra.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('¿Confirmar esta compra? El stock de los productos aumentará en el inventario.');">
+                        ✓ Confirmar e Ingresar a Stock
+                    </button>
+                </form>
+            {% elif compra.estado == "CONFIRMADA" %}
+                <button type="button" class="btn btn-danger btn-sm" onclick="mostrarModalAnulacion()">
+                    ✕ Anular Compra
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal simple de Anulación -->
+<div id="modal-anular" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; place-items: center;">
+    <div class="form-card" style="width: 100%; max-width: 480px; margin: 20px;">
+        <div class="form-card-header">
+            <h3>Anular Compra #{{ compra.id }}</h3>
+            <p>Al anular, se restarán las cantidades ingresadas del inventario.</p>
+        </div>
+        <form method="post" action="{% url 'compras:anular' compra.pk %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="motivo_anulacion">Motivo de la anulación <span class="required">*</span></label>
+                <textarea name="motivo" id="motivo_anulacion" class="form-control" rows="3" placeholder="Ej. Error en nota de entrega, devolución de pedido, etc." required></textarea>
+            </div>
+            <div class="form-actions" style="margin-top: 15px; padding-top: 15px;">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalAnulacion()">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Confirmar Anulación</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function mostrarModalAnulacion() {
+    const modal = document.getElementById('modal-anular');
+    modal.style.display = 'grid';
+}
+function cerrarModalAnulacion() {
+    const modal = document.getElementById('modal-anular');
+    modal.style.display = 'none';
+}
+</script>
+{% endblock %}

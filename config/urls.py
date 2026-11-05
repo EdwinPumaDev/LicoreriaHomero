@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -11,7 +11,7 @@ from apps.usuarios.views import dashboard
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # Inicio de sesión
+    # Autenticación
     path(
         "",
         auth_views.LoginView.as_view(
@@ -21,8 +21,19 @@ urlpatterns = [
         name="login",
     ),
 
-    # Panel principal protegido
     path("dashboard/", dashboard, name="dashboard"),
+
+    # Productos
+    path("productos/", include("apps.productos.urls")),
+
+    # Proveedores
+    path("proveedores/", include("apps.proveedores.urls")),
+
+    # Compras
+    path("compras/", include("apps.compras.urls")),
+
+    # Inventario
+    path("inventario/", include("apps.inventario.urls")),
 
     # Cerrar sesión
     path(
@@ -31,6 +42,7 @@ urlpatterns = [
         name="logout",
     ),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(

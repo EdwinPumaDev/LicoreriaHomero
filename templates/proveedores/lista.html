@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}LICORERÍA HOMERO / <strong>PROVEEDORES</strong>{% endblock %}
+
+{% block page_title %}Directorio de Proveedores{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <div>
+        <p style="margin: 0; color: var(--muted); font-size: 13px;">
+            Gestiona los distribuidores, bodegas y contactos comerciales para el abastecimiento.
+        </p>
+    </div>
+    <a href="{% url 'proveedores:crear' %}" class="btn btn-primary">
+        <span>+</span> Nuevo Proveedor
+    </a>
+</div>
+
+<section class="stats-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 22px;">
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Proveedores Registrados</span>
+            <span class="stat-icon burgundy">♧</span>
+        </div>
+        <strong class="stat-value">{{ total_proveedores }}</strong>
+        <small>Total en base de datos</small>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Proveedores Activos</span>
+            <span class="stat-icon green">✓</span>
+        </div>
+        <strong class="stat-value">{{ proveedores_activos }}</strong>
+        <small>Habilitados para nuevas compras</small>
+    </article>
+</section>
+
+<!-- Barra de Búsqueda -->
+<section class="filter-card">
+    <form method="get" class="filter-form">
+        <div style="flex: 3; min-width: 250px;">
+            <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por razón social, NIT, persona de contacto o teléfono...">
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <select name="estado" class="form-select">
+                <option value="activos" {% if estado == "activos" %}selected{% endif %}>Solo activos</option>
+                <option value="inactivos" {% if estado == "inactivos" %}selected{% endif %}>Inactivos</option>
+                <option value="todos" {% if estado == "todos" %}selected{% endif %}>Todos</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-secondary">
+                🔍 Buscar
+            </button>
+            {% if q or estado != 'activos' %}
+                <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary" title="Limpiar filtro">✕</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<!-- Tabla de Proveedores -->
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Proveedores Registrados</h2>
+            <p>{{ page_obj.paginator.count }} empresa(s) o distribuidor(es)</p>
+        </div>
+    </div>
+
+    {% if proveedores %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>RAZÓN SOCIAL / EMPRESA</th>
+                        <th>NIT</th>
+                        <th>CONTACTO</th>
+                        <th>TELÉFONO</th>
+                        <th>CORREO / DIRECCIÓN</th>
+                        <th>COMPRAS</th>
+                        <th>ESTADO</th>
+                        <th style="text-align: right;">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in proveedores %}
+                        <tr>
+                            <td>
+                                <strong style="font-size: 13px; color: var(--ink);">{{ p.nombre }}</strong>
+                                {% if p.observaciones %}
+                                    <small style="display: block; color: var(--muted); font-size: 11px; margin-top: 2px;">
+                                        {{ p.observaciones|truncatewords:8 }}
+                                    </small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <code>{{ p.nit|default:"Sin NIT" }}</code>
+                            </td>
+                            <td>
+                                <span>{{ p.persona_contacto|default:"No especificado" }}</span>
+                            </td>
+                            <td>
+                                {% if p.telefono %}
+                                    <a href="tel:{{ p.telefono }}" style="color: var(--wine); font-weight: 600;">
+                                        📞 {{ p.telefono }}
+                                    </a>
+                                {% else %}
+                                    <span style="color: var(--muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="font-size: 12px;">{{ p.correo|default:"Sin correo" }}</div>
+                                <small style="color: var(--muted);">{{ p.direccion|default:"Sin dirección" }}</small>
+                            </td>
+                            <td>
+                                <span class="badge badge-muted">
+                                    {{ p.total_compras_registradas }} compras
+                                </span>
+                            </td>
+                            <td>
+                                {% if p.activo %}
+                                    <span class="badge badge-success">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="table-actions" style="justify-content: flex-end;">
+                                    <a href="{% url 'proveedores:editar' p.pk %}" class="btn btn-secondary btn-sm" title="Editar">
+                                        ✏️ Editar
+                                    </a>
+                                    <a href="{% url 'proveedores:eliminar' p.pk %}" class="btn btn-danger btn-sm" title="Eliminar / Desactivar" onclick="return confirm('¿Seguro que deseas eliminar o desactivar a {{ p.nombre }}?');">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                <div class="pagination-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if q %}&q={{ q }}{% endif %}&estado={{ estado }}" class="btn btn-secondary btn-sm">« Primera</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}&estado={{ estado }}" class="btn btn-secondary btn-sm">‹ Anterior</a>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}&estado={{ estado }}" class="btn btn-secondary btn-sm">Siguiente ›</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}&estado={{ estado }}" class="btn btn-secondary btn-sm">Última »</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">♧</div>
+            <strong>No se encontraron proveedores</strong>
+            <p>Registra tus distribuidores para asociar compras e ingresos de productos.</p>
+            <a href="{% url 'proveedores:crear' %}" class="btn btn-primary" style="margin-top: 15px;">
+                + Registrar primer proveedor
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

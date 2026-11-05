@@ -1,0 +1,327 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Categorías y Marcas | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO /
+<a href="{% url 'productos:lista' %}" class="taxonomy-breadcrumb-link">PRODUCTOS</a>
+/ <strong>CATEGORÍAS Y MARCAS</strong>
+{% endblock %}
+
+{% block page_title %}Categorías y Marcas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/categorias_marcas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="taxonomy-page">
+
+    <div class="taxonomy-toolbar">
+        <div>
+            <span class="taxonomy-eyebrow">GESTIÓN DEL CATÁLOGO</span>
+            <p>Administra las categorías y marcas de los productos de tu licorería.</p>
+        </div>
+
+        <a href="{% url 'productos:lista' %}" class="taxonomy-back">
+            <span>←</span> Volver al catálogo
+        </a>
+    </div>
+
+    <div class="taxonomy-grid">
+
+        <!-- CATEGORÍAS -->
+        <section class="taxonomy-column">
+
+            <div class="taxonomy-panel">
+                <div class="taxonomy-panel-header">
+                    <div class="taxonomy-icon category-icon">▦</div>
+                    <div>
+                        <h2>Nueva categoría</h2>
+                        <p>Organiza los productos por familias.</p>
+                    </div>
+                </div>
+
+                <form method="post" class="taxonomy-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="tipo" value="categoria">
+
+                    {% if form_cat.non_field_errors %}
+                    <div class="taxonomy-error">
+                        {{ form_cat.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="taxonomy-field">
+                        <label for="{{ form_cat.nombre.id_for_label }}">
+                            Nombre de la categoría <span>*</span>
+                        </label>
+                        {{ form_cat.nombre }}
+                        {% for error in form_cat.nombre.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="taxonomy-field">
+                        <label for="{{ form_cat.descripcion.id_for_label }}">
+                            Descripción
+                        </label>
+                        {{ form_cat.descripcion }}
+                        {% for error in form_cat.descripcion.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <label class="taxonomy-checkbox">
+                        {{ form_cat.activo }}
+                        <span>Categoría activa</span>
+                    </label>
+
+                    <button type="submit" class="taxonomy-submit">
+                        <span>+</span> Guardar categoría
+                    </button>
+                </form>
+            </div>
+
+            <div class="taxonomy-list-panel">
+                <div class="taxonomy-list-header">
+                    <div>
+                        <h3>Categorías registradas</h3>
+                        <p>Clasificaciones de productos</p>
+                    </div>
+                    <span class="taxonomy-count">{{ categorias.count }}</span>
+                </div>
+
+                <div class="taxonomy-table-wrapper">
+                    <table class="taxonomy-table">
+                        <thead>
+                            <tr>
+                                <th>CATEGORÍA</th>
+                                <th>PRODUCTOS</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for cat in categorias %}
+                            <tr>
+                                <td>
+                                    <div class="taxonomy-name">{{ cat.nombre }}</div>
+                                    {% if cat.descripcion %}
+                                        <div class="taxonomy-description">
+                                            {{ cat.descripcion }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="product-counter">
+                                        {{ cat.productos.count }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if cat.activo %}
+                                        <span class="status-pill status-active">Activa</span>
+                                    {% else %}
+                                        <span class="status-pill status-inactive">Inactiva</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="taxonomy-actions">
+                                        <a
+                                            href="{% url 'productos:editar_categoria' cat.pk %}"
+                                            class="action-edit"
+                                            title="Editar categoría"
+                                        >
+                                            ✎
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'productos:cambiar_estado_categoria' cat.pk %}"
+                                            onsubmit="return confirm('¿Deseas {% if cat.activo %}desactivar{% else %}activar{% endif %} esta categoría?');"
+                                        >
+                                            {% csrf_token %}
+                                            <button
+                                                type="submit"
+                                                class="action-toggle {% if cat.activo %}action-disable{% else %}action-enable{% endif %}"
+                                                title="{% if cat.activo %}Desactivar{% else %}Activar{% endif %}"
+                                            >
+                                                {% if cat.activo %}⊘{% else %}✓{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="taxonomy-empty">
+                                        <span>▦</span>
+                                        <strong>Sin categorías</strong>
+                                        <small>Registra tu primera categoría.</small>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- MARCAS -->
+        <section class="taxonomy-column">
+
+            <div class="taxonomy-panel">
+                <div class="taxonomy-panel-header">
+                    <div class="taxonomy-icon brand-icon">◇</div>
+                    <div>
+                        <h2>Nueva marca</h2>
+                        <p>Registra las marcas comerciales.</p>
+                    </div>
+                </div>
+
+                <form method="post" class="taxonomy-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="tipo" value="marca">
+
+                    {% if form_marca.non_field_errors %}
+                    <div class="taxonomy-error">
+                        {{ form_marca.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="taxonomy-field">
+                        <label for="{{ form_marca.nombre.id_for_label }}">
+                            Nombre de la marca <span>*</span>
+                        </label>
+                        {{ form_marca.nombre }}
+                        {% for error in form_marca.nombre.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <div class="taxonomy-field">
+                        <label for="{{ form_marca.descripcion.id_for_label }}">
+                            Descripción u origen
+                        </label>
+                        {{ form_marca.descripcion }}
+                        {% for error in form_marca.descripcion.errors %}
+                            <small class="field-error">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+
+                    <label class="taxonomy-checkbox">
+                        {{ form_marca.activo }}
+                        <span>Marca activa</span>
+                    </label>
+
+                    <button type="submit" class="taxonomy-submit">
+                        <span>+</span> Guardar marca
+                    </button>
+                </form>
+            </div>
+
+            <div class="taxonomy-list-panel">
+                <div class="taxonomy-list-header">
+                    <div>
+                        <h3>Marcas registradas</h3>
+                        <p>Marcas comerciales disponibles</p>
+                    </div>
+                    <span class="taxonomy-count">{{ marcas.count }}</span>
+                </div>
+
+                <div class="taxonomy-table-wrapper">
+                    <table class="taxonomy-table">
+                        <thead>
+                            <tr>
+                                <th>MARCA</th>
+                                <th>PRODUCTOS</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for m in marcas %}
+                            <tr>
+                                <td>
+                                    <div class="taxonomy-name">{{ m.nombre }}</div>
+                                    {% if m.descripcion %}
+                                        <div class="taxonomy-description">
+                                            {{ m.descripcion }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="product-counter">
+                                        {{ m.productos.count }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {% if m.activo %}
+                                        <span class="status-pill status-active">Activa</span>
+                                    {% else %}
+                                        <span class="status-pill status-inactive">Inactiva</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="taxonomy-actions">
+                                        <a
+                                            href="{% url 'productos:editar_marca' m.pk %}"
+                                            class="action-edit"
+                                            title="Editar marca"
+                                        >
+                                            ✎
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'productos:cambiar_estado_marca' m.pk %}"
+                                            onsubmit="return confirm('¿Deseas {% if m.activo %}desactivar{% else %}activar{% endif %} esta marca?');"
+                                        >
+                                            {% csrf_token %}
+                                            <button
+                                                type="submit"
+                                                class="action-toggle {% if m.activo %}action-disable{% else %}action-enable{% endif %}"
+                                                title="{% if m.activo %}Desactivar{% else %}Activar{% endif %}"
+                                            >
+                                                {% if m.activo %}⊘{% else %}✓{% endif %}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="taxonomy-empty">
+                                        <span>◇</span>
+                                        <strong>Sin marcas</strong>
+                                        <small>Registra tu primera marca.</small>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+</div>
+{% endblock %}

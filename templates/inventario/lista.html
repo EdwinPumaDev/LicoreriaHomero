@@ -1,0 +1,267 @@
+
+{% extends "base.html" %}
+
+{% block title %}Historial de Inventario | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO / <strong>INVENTARIO</strong>
+{% endblock %}
+
+{% block page_title %}Control e Historial de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="toolbar">
+    <div>
+        <p style="margin: 0; color: var(--muted); font-size: 13px;">
+            Consulta los movimientos de mercadería y controla las variaciones del stock.
+        </p>
+    </div>
+</div>
+
+<!-- INDICADORES -->
+<section class="stats-grid"
+         style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 22px;">
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Movimientos registrados</span>
+            <span class="stat-icon gold">▤</span>
+        </div>
+        <strong class="stat-value">{{ total_movimientos }}</strong>
+        <small>Total de operaciones de inventario</small>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Entradas</span>
+            <span class="stat-icon green">↓</span>
+        </div>
+        <strong class="stat-value">{{ total_entradas }}</strong>
+        <small>Movimientos que incrementan el stock</small>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Salidas</span>
+            <span class="stat-icon orange">↑</span>
+        </div>
+        <strong class="stat-value">{{ total_salidas }}</strong>
+        <small>Movimientos que disminuyen el stock</small>
+    </article>
+
+</section>
+
+<!-- FILTROS -->
+<section class="filter-card">
+
+    <form method="get" class="filter-form">
+
+        <div style="flex: 2; min-width: 220px;">
+            <input
+                type="text"
+                name="q"
+                value="{{ q }}"
+                class="form-control"
+                placeholder="Buscar producto, usuario o motivo..."
+            >
+        </div>
+
+        <div style="flex: 1; min-width: 190px;">
+            <select name="tipo" class="form-select">
+                <option value="">Todos los movimientos</option>
+
+                {% for valor, etiqueta in tipos %}
+                    <option value="{{ valor }}"
+                        {% if tipo == valor %}selected{% endif %}>
+                        {{ etiqueta }}
+                    </option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-secondary">
+                🔍 Filtrar
+            </button>
+
+            {% if q or tipo %}
+                <a href="{% url 'inventario:lista' %}"
+                   class="btn btn-secondary"
+                   title="Limpiar filtros">
+                    ✕
+                </a>
+            {% endif %}
+        </div>
+
+    </form>
+
+</section>
+
+<!-- TABLA -->
+<section class="content-card">
+
+    <div class="card-heading">
+        <div>
+            <h2>Historial de movimientos</h2>
+            <p>{{ page_obj.paginator.count }} movimiento(s) encontrado(s)</p>
+        </div>
+    </div>
+
+    {% if movimientos %}
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>PRODUCTO</th>
+                    <th>TIPO</th>
+                    <th>CANTIDAD</th>
+                    <th>STOCK ANTERIOR</th>
+                    <th>STOCK ACTUAL</th>
+                    <th>RESPONSABLE</th>
+                    <th>MOTIVO</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for m in movimientos %}
+
+                <tr>
+
+                    <td>
+                        <span>{{ m.fecha|date:"d/m/Y" }}</span>
+                        <br>
+                        <small style="color: var(--muted);">
+                            {{ m.fecha|date:"H:i" }}
+                        </small>
+                    </td>
+
+                    <td>
+                        <strong>{{ m.producto.nombre }}</strong>
+                        {% if m.producto.codigo %}
+                            <br>
+                            <small style="color: var(--muted);">
+                                {{ m.producto.codigo }}
+                            </small>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if m.tipo == "ENTRADA_COMPRA" or m.tipo == "AJUSTE_ENTRADA" or m.tipo == "DEVOLUCION" %}
+                            <span class="badge badge-success">
+                                ↓ {{ m.get_tipo_display }}
+                            </span>
+                        {% elif m.tipo == "SALIDA_VENTA" or m.tipo == "AJUSTE_SALIDA" or m.tipo == "ANULACION" %}
+                            <span class="badge badge-warning">
+                                ↑ {{ m.get_tipo_display }}
+                            </span>
+                        {% else %}
+                            <span class="badge">
+                                {{ m.get_tipo_display }}
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong>{{ m.cantidad }}</strong>
+                    </td>
+
+                    <td>
+                        {{ m.stock_anterior }}
+                    </td>
+
+                    <td>
+                        <strong>{{ m.stock_posterior }}</strong>
+                    </td>
+
+                    <td>
+                        {{ m.usuario.get_full_name|default:m.usuario.username }}
+                    </td>
+
+                    <td>
+                        <small>
+                            {{ m.motivo|default:"Sin motivo especificado" }}
+                        </small>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- PAGINACIÓN -->
+    {% if page_obj.has_other_pages %}
+
+    <div class="pagination">
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        <div class="pagination-links">
+
+            {% if page_obj.has_previous %}
+
+                <a href="?page=1&q={{ q|urlencode }}&tipo={{ tipo|urlencode }}"
+                   class="btn btn-secondary btn-sm">
+                    « Primera
+                </a>
+
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&tipo={{ tipo|urlencode }}"
+                   class="btn btn-secondary btn-sm">
+                    ‹ Anterior
+                </a>
+
+            {% endif %}
+
+            {% if page_obj.has_next %}
+
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&tipo={{ tipo|urlencode }}"
+                   class="btn btn-secondary btn-sm">
+                    Siguiente ›
+                </a>
+
+                <a href="?page={{ page_obj.paginator.num_pages }}&q={{ q|urlencode }}&tipo={{ tipo|urlencode }}"
+                   class="btn btn-secondary btn-sm">
+                    Última »
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <div class="empty-icon">▤</div>
+
+        <strong>No hay movimientos de inventario</strong>
+
+        <p>
+            Cuando confirmes compras o registres ajustes de inventario,
+            los movimientos aparecerán aquí.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

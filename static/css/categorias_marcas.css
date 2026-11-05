@@ -1,0 +1,512 @@
+
+/* ==========================================
+   LICORERÍA HOMERO
+   GESTIÓN DE CATEGORÍAS Y MARCAS
+========================================== */
+
+.taxonomy-page {
+    width: 100%;
+    min-width: 0;
+}
+
+.taxonomy-breadcrumb-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.taxonomy-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 27px;
+}
+
+.taxonomy-toolbar p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 5px 0 0;
+}
+
+.taxonomy-eyebrow {
+    color: #a78a52;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.taxonomy-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 16px;
+    border: 1px solid var(--border, #e8e1dc);
+    border-radius: 9px;
+    color: var(--text, #342d2b);
+    background: white;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: .2s ease;
+}
+
+.taxonomy-back:hover {
+    border-color: #9b7950;
+    color: #805c36;
+    transform: translateY(-1px);
+}
+
+.taxonomy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 23px;
+    align-items: start;
+}
+
+.taxonomy-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.taxonomy-panel,
+.taxonomy-list-panel {
+    background: #fff;
+    border: 1px solid #eee8e4;
+    border-radius: 13px;
+    box-shadow: 0 5px 18px rgba(45, 27, 24, .035);
+    min-width: 0;
+}
+
+.taxonomy-panel {
+    padding: 23px;
+}
+
+.taxonomy-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding-bottom: 20px;
+    margin-bottom: 21px;
+    border-bottom: 1px solid #f0ece9;
+}
+
+.taxonomy-icon {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.category-icon {
+    background: #f7edf0;
+    color: #782d40;
+}
+
+.brand-icon {
+    background: #f8f2e5;
+    color: #a17a32;
+}
+
+.taxonomy-panel-header h2 {
+    margin: 0;
+    color: #34292a;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.taxonomy-panel-header p {
+    margin: 5px 0 0;
+    color: #958a86;
+    font-size: 11px;
+}
+
+.taxonomy-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.taxonomy-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.taxonomy-field label {
+    color: #4b4140;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.taxonomy-field label span {
+    color: #a13b4e;
+}
+
+.taxonomy-field input,
+.taxonomy-field textarea,
+.taxonomy-field select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #e8e1dd;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #392f2d;
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.taxonomy-field input:focus,
+.taxonomy-field textarea:focus,
+.taxonomy-field select:focus {
+    border-color: #9b6b50;
+    box-shadow: 0 0 0 3px rgba(155, 107, 80, .10);
+}
+
+.taxonomy-field textarea {
+    min-height: 78px;
+    resize: vertical;
+}
+
+.taxonomy-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #655956;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.taxonomy-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: #792f42;
+    cursor: pointer;
+}
+
+.taxonomy-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #762c40;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.taxonomy-submit:hover {
+    background: #5e2032;
+    box-shadow: 0 5px 12px rgba(118, 44, 64, .17);
+    transform: translateY(-1px);
+}
+
+.taxonomy-submit span {
+    font-size: 17px;
+    line-height: 12px;
+}
+
+.taxonomy-error,
+.field-error {
+    color: #a52f3f;
+    font-size: 11px;
+}
+
+.taxonomy-error {
+    padding: 10px 12px;
+    border-radius: 7px;
+    background: #fff0f1;
+}
+
+.taxonomy-list-panel {
+    overflow: hidden;
+}
+
+.taxonomy-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 19px 21px;
+    border-bottom: 1px solid #f0ece9;
+}
+
+.taxonomy-list-header h3 {
+    margin: 0;
+    color: #392e2c;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.taxonomy-list-header p {
+    margin: 5px 0 0;
+    color: #9a8f8a;
+    font-size: 11px;
+}
+
+.taxonomy-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 31px;
+    height: 31px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: #f7eff0;
+    color: #762c40;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.taxonomy-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.taxonomy-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.taxonomy-table th {
+    padding: 13px 14px;
+    background: #fbf9f8;
+    color: #958984;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .6px;
+    white-space: nowrap;
+}
+
+.taxonomy-table td {
+    padding: 14px;
+    border-top: 1px solid #f3efed;
+    color: #514543;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.taxonomy-table tbody tr:hover {
+    background: #fdfbfa;
+}
+
+.taxonomy-name {
+    color: #3c302f;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.taxonomy-description {
+    max-width: 180px;
+    margin-top: 4px;
+    color: #9a8e89;
+    font-size: 10px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.product-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 25px;
+    padding: 0 7px;
+    border-radius: 7px;
+    background: #f4f1ef;
+    color: #655550;
+    font-weight: 800;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.status-active {
+    background: #eaf6ee;
+    color: #32804d;
+}
+
+.status-inactive {
+    background: #fbecee;
+    color: #ae4652;
+}
+
+.taxonomy-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 28px 12px;
+    text-align: center;
+}
+
+.taxonomy-empty > span {
+    color: #b49a79;
+    font-size: 25px;
+}
+
+.taxonomy-empty strong {
+    color: #514340;
+    font-size: 12px;
+}
+
+.taxonomy-empty small {
+    color: #a19590;
+    font-size: 10px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+    .taxonomy-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .taxonomy-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .taxonomy-back {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+
+    .taxonomy-panel {
+        padding: 17px;
+    }
+
+    .taxonomy-list-header {
+        padding: 16px;
+    }
+
+    .taxonomy-table th,
+    .taxonomy-table td {
+        padding: 11px 10px;
+    }
+}
+
+/* FORMULARIO DE EDICIÓN */
+
+.taxonomy-edit-container {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.taxonomy-edit-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.taxonomy-edit-actions .taxonomy-submit {
+    flex: 1;
+}
+
+.taxonomy-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border: 1px solid #e8e1dd;
+    border-radius: 8px;
+    color: #655956;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.taxonomy-cancel:hover {
+    background: #f8f5f3;
+}
+
+@media (max-width: 480px) {
+    .taxonomy-edit-actions {
+        flex-direction: column-reverse;
+    }
+}
+
+
+/* ACCIONES DE CATEGORÍAS Y MARCAS */
+
+.taxonomy-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.taxonomy-actions form {
+    margin: 0;
+}
+
+.action-edit,
+.action-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #eae3df;
+    border-radius: 7px;
+    background: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.action-edit {
+    color: #86632e;
+}
+
+.action-edit:hover {
+    background: #f8f2e6;
+    border-color: #c7a66c;
+}
+
+.action-disable {
+    color: #b34b55;
+}
+
+.action-disable:hover {
+    background: #fff0f1;
+    border-color: #dba3a8;
+}
+
+.action-enable {
+    color: #32804d;
+}
+
+.action-enable:hover {
+    background: #eaf6ee;
+    border-color: #9bcbaa;
+}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}LICORERÍA HOMERO / <a href="{% url 'proveedores:lista' %}" style="color: inherit;">PROVEEDORES</a> / <strong>{{ accion|upper }}</strong>{% endblock %}
+
+{% block page_title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<form method="post" style="max-width: 900px; margin: 0 auto;">
+    {% csrf_token %}
+
+    <div class="form-card">
+        <div class="form-card-header">
+            <h3>Información de la Empresa Proveedora</h3>
+            <p>Datos fiscales y comerciales de la distribuidora o bodega</p>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="{{ form.nombre.id_for_label }}">
+                    Razón Social / Nombre <span class="required">*</span>
+                </label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                    <div class="form-error">{{ form.nombre.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.nit.id_for_label }}">
+                    NIT (Número de Identificación Tributaria)
+                </label>
+                {{ form.nit }}
+                {% if form.nit.errors %}
+                    <div class="form-error">{{ form.nit.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="{{ form.persona_contacto.id_for_label }}">
+                    Persona de Contacto / Asesor Comercial
+                </label>
+                {{ form.persona_contacto }}
+                {% if form.persona_contacto.errors %}
+                    <div class="form-error">{{ form.persona_contacto.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.telefono.id_for_label }}">
+                    Teléfono / Celular
+                </label>
+                {{ form.telefono }}
+                {% if form.telefono.errors %}
+                    <div class="form-error">{{ form.telefono.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="{{ form.correo.id_for_label }}">
+                    Correo Electrónico
+                </label>
+                {{ form.correo }}
+                {% if form.correo.errors %}
+                    <div class="form-error">{{ form.correo.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.direccion.id_for_label }}">
+                    Dirección del Almacén / Distribuidora
+                </label>
+                {{ form.direccion }}
+                {% if form.direccion.errors %}
+                    <div class="form-error">{{ form.direccion.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.observaciones.id_for_label }}">
+                Observaciones Comerciales
+            </label>
+            {{ form.observaciones }}
+            <div class="form-help">Condiciones de pago, días de reparto o acuerdos especiales</div>
+            {% if form.observaciones.errors %}
+                <div class="form-error">{{ form.observaciones.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-check">
+                {{ form.activo }}
+                <span>Proveedor activo (disponible para registrar compras)</span>
+            </label>
+            {% if form.activo.errors %}
+                <div class="form-error">{{ form.activo.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'proveedores:lista' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">
+                ✓ {{ accion }}
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

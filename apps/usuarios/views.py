@@ -1,6 +1,6 @@
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.shortcuts import render
 
 from apps.productos.models import Producto
@@ -25,7 +25,7 @@ def dashboard(request):
 
     productos_bajo_stock = Producto.objects.filter(
         activo=True,
-        stock__lte=models_stock_minimo(),
+        stock__lte=F("stock_minimo"),
     ).count()
 
     ultimas_ventas = ventas_confirmadas.order_by(
@@ -42,7 +42,3 @@ def dashboard(request):
 
     return render(request, "usuarios/dashboard.html", contexto)
 
-
-def models_stock_minimo():
-    from django.db.models import F
-    return F("stock_minimo")

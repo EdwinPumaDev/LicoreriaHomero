@@ -40,3 +40,22 @@ class PerfilUsuario(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.get_cargo_display()}"
+
+
+# Señal para crear o sincronizar automáticamente el perfil de usuario
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def crear_o_guardar_perfil_usuario(sender, instance, created, **kwargs):
+    if created:
+        cargo = (
+            PerfilUsuario.Cargo.ADMINISTRADOR
+            if instance.is_superuser
+            else PerfilUsuario.Cargo.VENDEDOR
+        )
+        PerfilUsuario.objects.get_or_create(usuario=instance, defaults={"cargo": cargo})
+    elif hasattr(instance, "perfil"):
+        instance.perfil.save()
+

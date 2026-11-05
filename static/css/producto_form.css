@@ -1,0 +1,543 @@
+
+/* ==================================================
+   LICORERÍA HOMERO - FORMULARIO DE PRODUCTOS
+   Identidad visual premium: borgoña, dorado y blanco
+   ================================================== */
+
+.product-form-page,
+.product-form-page * {
+    box-sizing: border-box;
+}
+
+.product-form-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+    padding-bottom: 25px;
+    color: #29252b;
+}
+
+.product-form-heading {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: #a87936;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.7px;
+}
+
+.product-form-heading h2 {
+    margin: 0;
+    color: #3c111d;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.product-form-heading p {
+    margin: 7px 0 0;
+    color: #8792a2;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.form-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid #e8dfe2;
+    border-radius: 8px;
+    color: #651b2b;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.form-back-link:hover {
+    background: #f8eef1;
+    border-color: #d8b9c1;
+}
+
+.form-breadcrumb-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.form-breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.product-form {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.product-form-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    gap: 20px;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+    width: 100%;
+}
+
+.form-panel {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e8e1e4;
+    border-radius: 13px;
+    background: #ffffff;
+    box-shadow: 0 5px 18px rgba(60, 17, 29, 0.045);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.form-panel:hover {
+    box-shadow: 0 8px 24px rgba(60, 17, 29, 0.075);
+}
+
+.form-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 19px 21px;
+    border-bottom: 1px solid #f0eaed;
+    background: linear-gradient(110deg, #ffffff, #fdfbfc);
+}
+
+.panel-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    border-radius: 11px;
+    color: #651b2b;
+    background: #f7eaf0;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.panel-icon-gold {
+    color: #98702d;
+    background: #fbf3e4;
+}
+
+.panel-icon-purple {
+    color: #8061a5;
+    background: #f3eff9;
+}
+
+.panel-icon-green {
+    color: #287c59;
+    background: #eaf6ef;
+    font-size: 13px;
+}
+
+.form-panel-heading h3 {
+    margin: 0;
+    color: #3c111d;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.form-panel-heading p {
+    margin: 5px 0 0;
+    color: #929baa;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.form-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 21px;
+    min-width: 0;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    width: 100%;
+}
+
+.form-field > label,
+.field-label-row label {
+    color: #536176;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.required-mark {
+    color: #b83c50;
+    font-weight: 800;
+}
+
+.form-field input:not([type="checkbox"]),
+.form-field select,
+.form-field textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #e1dce0;
+    border-radius: 8px;
+    outline: none;
+    color: #344155;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field textarea {
+    min-height: 94px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-field input[type="file"] {
+    min-height: auto;
+    padding: 10px;
+    border-style: dashed;
+    background: #fcfafb;
+    cursor: pointer;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    border-color: #9a5969;
+    box-shadow: 0 0 0 3px rgba(101, 27, 43, 0.08);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: #a6afbb;
+}
+
+.form-field small {
+    color: #98a1ae;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.form-two-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+    min-width: 0;
+}
+
+.field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.field-label-row a {
+    color: #8e3548;
+    font-size: 10px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.field-label-row a:hover {
+    text-decoration: underline;
+}
+
+.field-error {
+    color: #b63e4b;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.form-alert-error {
+    margin-bottom: 18px;
+    padding: 13px 16px;
+    border: 1px solid #f0c7ca;
+    border-radius: 9px;
+    color: #a63843;
+    background: #fff2f2;
+    font-size: 12px;
+}
+
+.form-alert-error p {
+    margin: 3px 0;
+}
+
+.current-image,
+.image-preview {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px;
+    border: 1px solid #eee5e9;
+    border-radius: 9px;
+    background: #fcfafb;
+}
+
+.current-image img,
+.image-preview img {
+    width: 68px;
+    height: 68px;
+    flex: 0 0 68px;
+    object-fit: cover;
+    border: 1px solid #e5e9ef;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.current-image div,
+.image-preview div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.current-image strong,
+.image-preview strong {
+    color: #455267;
+    font-size: 11px;
+}
+
+.current-image small,
+.image-preview small {
+    overflow-wrap: anywhere;
+    color: #929baa;
+    font-size: 10px;
+}
+
+.image-preview[hidden] {
+    display: none;
+}
+
+.product-active-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 3px;
+    padding: 14px;
+    border: 1px solid #eee5e9;
+    border-radius: 9px;
+    background: #fcfafb;
+}
+
+.product-active-option > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.product-active-option strong {
+    color: #455267;
+    font-size: 12px;
+}
+
+.product-active-option small {
+    color: #929baa;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.switch-control {
+    position: relative;
+    display: inline-flex;
+    width: 42px;
+    height: 23px;
+    flex: 0 0 42px;
+    cursor: pointer;
+}
+
+.switch-control input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    background: #cbd2dc;
+    transition: 0.2s ease;
+}
+
+.switch-slider::before {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #ffffff;
+    content: "";
+    transition: 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.switch-control input:checked + .switch-slider {
+    background: #25845e;
+}
+
+.switch-control input:checked + .switch-slider::before {
+    transform: translateX(19px);
+}
+
+.switch-control input:focus-visible + .switch-slider {
+    outline: 3px solid rgba(101, 27, 43, 0.2);
+    outline-offset: 2px;
+}
+
+.product-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 11px;
+    margin-top: 20px;
+    padding: 17px 20px;
+    border: 1px solid #e8e1e4;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(60, 17, 29, 0.035);
+}
+
+.form-cancel-button,
+.form-save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 43px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.form-cancel-button {
+    border: 1px solid #e1dce0;
+    color: #657287;
+    background: #ffffff;
+}
+
+.form-cancel-button:hover {
+    background: #f8f5f6;
+}
+
+.form-save-button {
+    border: 1px solid #651b2b;
+    color: #ffffff;
+    background: linear-gradient(110deg, #651b2b, #852f43);
+    box-shadow: 0 4px 10px rgba(101, 27, 43, 0.16);
+}
+
+.form-save-button:hover {
+    border-color: #8a3549;
+    background: #8a3549;
+    transform: translateY(-1px);
+}
+
+/* Ajustes para pantallas medianas */
+
+@media (max-width: 1250px) {
+    .product-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-column {
+        gap: 18px;
+    }
+}
+
+/* Tablets y teléfonos */
+
+@media (max-width: 760px) {
+    .product-form-page {
+        gap: 17px;
+    }
+
+    .product-form-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .product-form-heading h2 {
+        font-size: 23px;
+    }
+
+    .form-back-link {
+        width: 100%;
+    }
+
+    .form-panel-heading {
+        padding: 16px;
+    }
+
+    .form-panel-body {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-two-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .product-form-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+        padding: 14px;
+    }
+
+    .form-cancel-button,
+    .form-save-button {
+        width: 100%;
+    }
+
+    .field-label-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+}

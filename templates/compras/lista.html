@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Compras y Abastecimiento | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}LICORERÍA HOMERO / <strong>COMPRAS</strong>{% endblock %}
+
+{% block page_title %}Compras e Ingreso de Mercadería{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+    <div>
+        <p style="margin: 0; color: var(--muted); font-size: 13px;">
+            Registra el abastecimiento de licores y bebidas para incrementar el stock del inventario.
+        </p>
+    </div>
+    <a href="{% url 'compras:crear' %}" class="btn btn-primary">
+        <span>+</span> Registrar Compra
+    </a>
+</div>
+
+<!-- KPIs Rápidos -->
+<section class="stats-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 22px;">
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Inversión Confirmada</span>
+            <span class="stat-icon gold">Bs</span>
+        </div>
+        <strong class="stat-value">Bs {{ total_invertido|floatformat:2 }}</strong>
+        <small>Total en compras confirmadas</small>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Compras Confirmadas</span>
+            <span class="stat-icon green">✓</span>
+        </div>
+        <strong class="stat-value">{{ total_confirmadas }}</strong>
+        <small>Ingresadas al stock del negocio</small>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            <span>Borradores Pendientes</span>
+            <span class="stat-icon orange">▤</span>
+        </div>
+        <strong class="stat-value">{{ total_borradores }}</strong>
+        <small>Órdenes sin confirmar en stock</small>
+    </article>
+</section>
+
+<!-- Barra de Filtros -->
+<section class="filter-card">
+    <form method="get" class="filter-form">
+        <div style="flex: 2; min-width: 220px;">
+            <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por N.º de compra, comprobante o proveedor...">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <select name="proveedor" class="form-select">
+                <option value="">Todos los proveedores</option>
+                {% for prov in proveedores %}
+                    <option value="{{ prov.id }}" {% if proveedor_id == prov.id|stringformat:"s" %}selected{% endif %}>
+                        {{ prov.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <select name="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                {% for val, label in estados %}
+                    <option value="{{ val }}" {% if estado == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-secondary">
+                🔍 Filtrar
+            </button>
+            {% if q or estado or proveedor_id %}
+                <a href="{% url 'compras:lista' %}" class="btn btn-secondary" title="Limpiar filtros">✕</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<!-- Tabla de Compras -->
+<section class="content-card">
+    <div class="card-heading">
+        <div>
+            <h2>Historial de Compras</h2>
+            <p>{{ page_obj.paginator.count }} orden(es) registrada(s)</p>
+        </div>
+    </div>
+
+    {% if compras %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>N.º COMPRA</th>
+                        <th>FECHA</th>
+                        <th>PROVEEDOR</th>
+                        <th>N.º COMPROBANTE</th>
+                        <th>TOTAL</th>
+                        <th>REGISTRADO POR</th>
+                        <th>ESTADO</th>
+                        <th style="text-align: right;">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in compras %}
+                        <tr>
+                            <td>
+                                <strong>Compra #{{ c.id }}</strong>
+                            </td>
+                            <td>
+                                <span>{{ c.fecha|date:"d/m/Y H:i" }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ c.proveedor.nombre }}</strong>
+                            </td>
+                            <td>
+                                <code>{{ c.numero_comprobante|default:"Sin comprobante" }}</code>
+                            </td>
+                            <td>
+                                <strong class="price-tag">Bs {{ c.total|floatformat:2 }}</strong>
+                            </td>
+                            <td>
+                                <small style="color: var(--muted);">{{ c.usuario.get_full_name|default:c.usuario.username }}</small>
+                            </td>
+                            <td>
+                                {% if c.estado == "CONFIRMADA" %}
+                                    <span class="badge badge-success">✓ Confirmada</span>
+                                {% elif c.estado == "BORRADOR" %}
+                                    <span class="badge badge-warning">▤ Borrador</span>
+                                {% else %}
+                                    <span class="badge badge-danger">✕ Anulada</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="table-actions" style="justify-content: flex-end;">
+                                    <a href="{% url 'compras:detalle' c.pk %}" class="btn btn-secondary btn-sm" title="Ver detalle">
+                                        👁️ Ver
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                <div class="pagination-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if proveedor_id %}&proveedor={{ proveedor_id }}{% endif %}" class="btn btn-secondary btn-sm">« Primera</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if proveedor_id %}&proveedor={{ proveedor_id }}{% endif %}" class="btn btn-secondary btn-sm">‹ Anterior</a>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if proveedor_id %}&proveedor={{ proveedor_id }}{% endif %}" class="btn btn-secondary btn-sm">Siguiente ›</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if estado %}&estado={{ estado }}{% endif %}{% if proveedor_id %}&proveedor={{ proveedor_id }}{% endif %}" class="btn btn-secondary btn-sm">Última »</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">⇩</div>
+            <strong>No hay compras registradas</strong>
+            <p>Registra las compras de mercadería para alimentar el stock de tus licores.</p>
+            <a href="{% url 'compras:crear' %}" class="btn btn-primary" style="margin-top: 15px;">
+                + Registrar primera compra
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,89 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ titulo }} | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO /
+<a href="{% url 'productos:categorias_marcas' %}" class="taxonomy-breadcrumb-link">CATEGORÍAS Y MARCAS</a>
+/ <strong>EDICIÓN</strong>
+{% endblock %}
+
+{% block page_title %}{{ titulo }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/categorias_marcas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="taxonomy-page">
+
+    <div class="taxonomy-toolbar">
+        <div>
+            <span class="taxonomy-eyebrow">GESTIÓN DEL CATÁLOGO</span>
+            <p>{{ descripcion }}</p>
+        </div>
+
+        <a href="{% url 'productos:categorias_marcas' %}" class="taxonomy-back">
+            ← Volver
+        </a>
+    </div>
+
+    <div class="taxonomy-edit-container">
+        <div class="taxonomy-panel">
+
+            <div class="taxonomy-panel-header">
+                <div class="taxonomy-icon category-icon">✎</div>
+                <div>
+                    <h2>{{ titulo }}</h2>
+                    <p>Actualiza la información del registro.</p>
+                </div>
+            </div>
+
+            <form method="post" class="taxonomy-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="taxonomy-error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <label class="taxonomy-checkbox">
+                            {{ field }}
+                            <span>{{ field.label }}</span>
+                        </label>
+                    {% else %}
+                        <div class="taxonomy-field">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                                {% if field.field.required %}<span>*</span>{% endif %}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <small class="field-error">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="taxonomy-edit-actions">
+                    <a href="{% url 'productos:categorias_marcas' %}" class="taxonomy-cancel">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="taxonomy-submit">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

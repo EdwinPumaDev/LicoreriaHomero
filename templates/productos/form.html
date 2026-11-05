@@ -1,0 +1,340 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ titulo }} | Licorería Homero{% endblock %}
+{% block page_title %}Productos{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO / <a href="{% url 'productos:lista' %}" class="form-breadcrumb-link">PRODUCTOS</a> / <strong>{{ accion|upper }}</strong>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/producto_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="product-form-page">
+
+    <div class="product-form-heading">
+        <div>
+            <span class="form-eyebrow">GESTIÓN DE INVENTARIO</span>
+            <h2>{{ titulo }}</h2>
+            <p>Registra y organiza los productos de Licorería Homero.</p>
+        </div>
+
+        <a href="{% url 'productos:lista' %}" class="form-back-link">
+            ← Volver al catálogo
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="product-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="form-alert-error">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="product-form-grid">
+
+            <div class="form-column">
+
+                <section class="form-panel">
+                    <div class="form-panel-heading">
+                        <div class="panel-icon">▣</div>
+                        <div>
+                            <h3>Identificación del producto</h3>
+                            <p>Información general y códigos de identificación.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-panel-body">
+
+                        <div class="form-field">
+                            <label for="{{ form.nombre.id_for_label }}">
+                                Nombre del producto <span class="required-mark">*</span>
+                            </label>
+                            {{ form.nombre }}
+                            {% if form.nombre.errors %}
+                                <div class="field-error">{{ form.nombre.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-two-columns">
+                            <div class="form-field">
+                                <label for="{{ form.codigo.id_for_label }}">
+                                    Código interno <span class="required-mark">*</span>
+                                </label>
+                                {{ form.codigo }}
+                                <small>Ej. SING-CR-750</small>
+                                {% if form.codigo.errors %}
+                                    <div class="field-error">{{ form.codigo.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.codigo_barras.id_for_label }}">
+                                    Código de barras
+                                </label>
+                                {{ form.codigo_barras }}
+                                <small>Campo opcional.</small>
+                                {% if form.codigo_barras.errors %}
+                                    <div class="field-error">{{ form.codigo_barras.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="{{ form.descripcion.id_for_label }}">
+                                Descripción del producto
+                            </label>
+                            {{ form.descripcion }}
+                            <small>Detalles adicionales, presentación o características.</small>
+                            {% if form.descripcion.errors %}
+                                <div class="field-error">{{ form.descripcion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="form-panel">
+                    <div class="form-panel-heading">
+                        <div class="panel-icon panel-icon-gold">▧</div>
+                        <div>
+                            <h3>Fotografía del producto</h3>
+                            <p>Imagen representativa de la botella o presentación.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-panel-body">
+
+                        {% if producto.imagen %}
+                        <div class="current-image">
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            <div>
+                                <strong>Imagen actual</strong>
+                                <small>{{ producto.imagen.name }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="form-field">
+                            <label for="{{ form.imagen.id_for_label }}">
+                                Seleccionar imagen
+                            </label>
+                            {{ form.imagen }}
+                            <small>Formatos recomendados: JPG, PNG o WEBP.</small>
+                            {% if form.imagen.errors %}
+                                <div class="field-error">{{ form.imagen.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="image-preview" id="image-preview-container" hidden>
+                            <img id="image-preview" src="" alt="Vista previa del producto">
+                            <div>
+                                <strong>Vista previa</strong>
+                                <small>Imagen seleccionada</small>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="form-column">
+
+                <section class="form-panel">
+                    <div class="form-panel-heading">
+                        <div class="panel-icon panel-icon-purple">▤</div>
+                        <div>
+                            <h3>Clasificación y unidad</h3>
+                            <p>Organiza el producto dentro del catálogo.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-panel-body">
+
+                        <div class="form-field">
+                            <div class="field-label-row">
+                                <label for="{{ form.categoria.id_for_label }}">
+                                    Categoría <span class="required-mark">*</span>
+                                </label>
+                                <a href="{% url 'productos:categorias_marcas' %}" target="_blank">
+                                    + Crear categoría
+                                </a>
+                            </div>
+
+                            {{ form.categoria }}
+
+                            {% if form.categoria.errors %}
+                                <div class="field-error">{{ form.categoria.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <div class="field-label-row">
+                                <label for="{{ form.marca.id_for_label }}">Marca</label>
+                                <a href="{% url 'productos:categorias_marcas' %}" target="_blank">
+                                    + Crear marca
+                                </a>
+                            </div>
+
+                            {{ form.marca }}
+
+                            {% if form.marca.errors %}
+                                <div class="field-error">{{ form.marca.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-field">
+                            <label for="{{ form.unidad_medida.id_for_label }}">
+                                Unidad de medida <span class="required-mark">*</span>
+                            </label>
+
+                            {{ form.unidad_medida }}
+
+                            {% if form.unidad_medida.errors %}
+                                <div class="field-error">{{ form.unidad_medida.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="form-panel">
+                    <div class="form-panel-heading">
+                        <div class="panel-icon panel-icon-green">Bs</div>
+                        <div>
+                            <h3>Precios y existencias</h3>
+                            <p>Control económico y disponibilidad del producto.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-panel-body">
+
+                        <div class="form-two-columns">
+                            <div class="form-field">
+                                <label for="{{ form.costo.id_for_label }}">
+                                    Costo de compra (Bs)
+                                </label>
+                                {{ form.costo }}
+                                <small>Precio pagado al proveedor.</small>
+                                {% if form.costo.errors %}
+                                    <div class="field-error">{{ form.costo.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.precio_venta.id_for_label }}">
+                                    Precio de venta (Bs) <span class="required-mark">*</span>
+                                </label>
+                                {{ form.precio_venta }}
+                                <small>Precio para el cliente.</small>
+                                {% if form.precio_venta.errors %}
+                                    <div class="field-error">{{ form.precio_venta.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-two-columns">
+                            <div class="form-field">
+                                <label for="{{ form.stock.id_for_label }}">
+                                    Stock inicial
+                                </label>
+                                {{ form.stock }}
+                                <small>Existencias actuales.</small>
+                                {% if form.stock.errors %}
+                                    <div class="field-error">{{ form.stock.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.stock_minimo.id_for_label }}">
+                                    Stock mínimo
+                                </label>
+                                {{ form.stock_minimo }}
+                                <small>Umbral para alertas.</small>
+                                {% if form.stock_minimo.errors %}
+                                    <div class="field-error">{{ form.stock_minimo.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="product-active-option">
+                            <div>
+                                <strong>Producto activo</strong>
+                                <small>Disponible en el catálogo y las operaciones.</small>
+                            </div>
+
+                            <label class="switch-control">
+                                {{ form.activo }}
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        {% if form.activo.errors %}
+                            <div class="field-error">{{ form.activo.errors.0 }}</div>
+                        {% endif %}
+
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <div class="product-form-actions">
+            <a href="{% url 'productos:lista' %}" class="form-cancel-button">
+                Cancelar
+            </a>
+
+            <button type="submit" class="form-save-button">
+                ✓ {{ accion }} producto
+            </button>
+        </div>
+
+    </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("{{ form.imagen.id_for_label }}");
+    const container = document.getElementById("image-preview-container");
+    const preview = document.getElementById("image-preview");
+
+    if (input && container && preview) {
+        input.addEventListener("change", function () {
+            const file = this.files && this.files[0];
+
+            if (!file) {
+                container.hidden = true;
+                preview.removeAttribute("src");
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+                container.hidden = true;
+                preview.removeAttribute("src");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+                container.hidden = false;
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+});
+</script>
+{% endblock %}

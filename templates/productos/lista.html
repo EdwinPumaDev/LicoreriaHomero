@@ -1,0 +1,384 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Productos | Licorería Homero{% endblock %}
+{% block page_title %}Gestión de productos{% endblock %}
+{% block breadcrumb %}LICORERÍA HOMERO / <strong>PRODUCTOS</strong>{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/productos.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="products-page">
+
+    <div class="products-heading">
+        <div>
+            <p class="section-eyebrow">INVENTARIO Y CATÁLOGO</p>
+            <h2>Productos</h2>
+            <p class="section-description">
+                Administra los productos, precios y existencias de tu licorería.
+            </p>
+        </div>
+
+        <div class="heading-actions">
+            <a href="{% url 'productos:categorias_marcas' %}" class="btn-secondary">
+                <span>⚙</span> Categorías y marcas
+            </a>
+
+            <a href="{% url 'productos:crear' %}" class="btn-primary">
+                <span>＋</span> Nuevo producto
+            </a>
+        </div>
+    </div>
+
+    <div class="product-metrics">
+
+        <article class="metric-card">
+            <div class="metric-icon metric-icon-blue">▣</div>
+            <div class="metric-info">
+                <span>Productos activos</span>
+                <strong>{{ total_catalogo }}</strong>
+                <small>En el catálogo</small>
+            </div>
+        </article>
+
+        <article class="metric-card">
+            <div class="metric-icon metric-icon-orange">⚠</div>
+            <div class="metric-info">
+                <span>Stock bajo</span>
+                <strong>{{ total_bajo_stock }}</strong>
+                <small>Requieren reposición</small>
+            </div>
+        </article>
+
+        <article class="metric-card">
+            <div class="metric-icon metric-icon-green">Bs</div>
+            <div class="metric-info">
+                <span>Valor del inventario</span>
+                <strong>Bs {{ valor_inventario|floatformat:2 }}</strong>
+                <small>Según costo de compra</small>
+            </div>
+        </article>
+
+    </div>
+
+    <section class="catalog-card">
+
+        <div class="catalog-header">
+            <div>
+                <h3>Listado de productos</h3>
+                <p>Consulta y administra los productos registrados.</p>
+            </div>
+
+            <span class="catalog-count">
+                {{ page_obj.paginator.count }} registros
+            </span>
+        </div>
+
+        <form method="get" class="filters-form">
+
+            <div class="search-field">
+                <label for="search-products">Buscar producto</label>
+
+                <div class="search-input-wrap">
+                    <span>⌕</span>
+
+                    <input
+                        type="search"
+                        id="search-products"
+                        name="q"
+                        value="{{ q }}"
+                        placeholder="Nombre, código o código de barras..."
+                    >
+                </div>
+            </div>
+
+            <div class="filter-field">
+                <label for="filter-category">Categoría</label>
+
+                <select name="categoria" id="filter-category">
+                    <option value="">Todas las categorías</option>
+
+                    {% for categoria in categorias %}
+                        <option
+                            value="{{ categoria.id }}"
+                            {% if categoria_id == categoria.id|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ categoria.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="filter-brand">Marca</label>
+
+                <select name="marca" id="filter-brand">
+                    <option value="">Todas las marcas</option>
+
+                    {% for marca in marcas %}
+                        <option
+                            value="{{ marca.id }}"
+                            {% if marca_id == marca.id|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ marca.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="filter-status">Estado</label>
+
+                <select name="estado" id="filter-status">
+                    <option value="activos" {% if estado == "activos" %}selected{% endif %}>
+                        Activos
+                    </option>
+
+                    <option value="inactivos" {% if estado == "inactivos" %}selected{% endif %}>
+                        Inactivos
+                    </option>
+
+                    <option value="todos" {% if estado == "todos" %}selected{% endif %}>
+                        Todos
+                    </option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter">
+                    Filtrar
+                </button>
+
+                <a href="{% url 'productos:lista' %}" class="btn-clear">
+                    Limpiar
+                </a>
+            </div>
+
+            <label class="low-stock-filter">
+                <input
+                    type="checkbox"
+                    name="stock_bajo"
+                    value="1"
+                    {% if solo_stock_bajo %}checked{% endif %}
+                >
+                Mostrar solamente productos con stock bajo
+            </label>
+
+        </form>
+
+        <div class="table-responsive">
+
+            <table class="products-table">
+
+                <thead>
+                    <tr>
+                        <th>PRODUCTO</th>
+                        <th>CÓDIGO</th>
+                        <th>CATEGORÍA</th>
+                        <th>MARCA</th>
+                        <th>PRECIO</th>
+                        <th>STOCK</th>
+                        <th>ESTADO</th>
+                        <th class="text-right">ACCIONES</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for producto in productos %}
+
+                    <tr>
+
+                        <td>
+                            <div class="product-cell">
+
+                                <div class="product-image">
+                                    {% if producto.imagen %}
+                                        <img
+                                            src="{{ producto.imagen.url }}"
+                                            alt="{{ producto.nombre }}"
+                                        >
+                                    {% else %}
+                                        <span>▣</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="product-name">
+                                    <strong>{{ producto.nombre }}</strong>
+                                    <small>{{ producto.get_unidad_medida_display }}</small>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="product-code">
+                                {{ producto.codigo }}
+                            </span>
+                        </td>
+
+                        <td>{{ producto.categoria.nombre }}</td>
+
+                        <td>
+                            {% if producto.marca %}
+                                {{ producto.marca.nombre }}
+                            {% else %}
+                                <span class="muted-text">Sin marca</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <strong class="price-value">
+                                Bs {{ producto.precio_venta|floatformat:2 }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if producto.necesita_reposicion %}
+                                <span class="stock-badge stock-low">
+                                    {{ producto.stock }} unidades
+                                </span>
+                            {% else %}
+                                <span class="stock-badge stock-normal">
+                                    {{ producto.stock }} unidades
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if producto.activo %}
+                                <span class="status-badge status-active">
+                                    Activo
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-inactive">
+                                    Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="table-actions">
+
+                                <a
+                                    href="{% url 'productos:editar' producto.pk %}"
+                                    class="action-button action-edit"
+                                    title="Editar producto"
+                                >
+                                    ✎
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'productos:eliminar' producto.pk %}"
+                                    onsubmit="return confirm('¿Estás seguro de eliminar o desactivar este producto?');"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="action-button action-delete"
+                                        title="Eliminar producto"
+                                    >
+                                        ×
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="8">
+
+                            <div class="empty-state">
+                                <div class="empty-icon">▣</div>
+
+                                <h3>No se encontraron productos</h3>
+
+                                <p>
+                                    No hay productos que coincidan con los filtros seleccionados.
+                                </p>
+
+                                <a href="{% url 'productos:crear' %}" class="btn-primary">
+                                    ＋ Registrar producto
+                                </a>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% if page_obj.has_other_pages %}
+
+        <div class="pagination-container">
+
+            <span class="pagination-info">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            <div class="pagination-controls">
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?q={{ q|urlencode }}&categoria={{ categoria_id }}&marca={{ marca_id }}&estado={{ estado }}{% if solo_stock_bajo %}&stock_bajo=1{% endif %}&page=1"
+                        class="page-button"
+                    >
+                        «
+                    </a>
+
+                    <a
+                        href="?q={{ q|urlencode }}&categoria={{ categoria_id }}&marca={{ marca_id }}&estado={{ estado }}{% if solo_stock_bajo %}&stock_bajo=1{% endif %}&page={{ page_obj.previous_page_number }}"
+                        class="page-button"
+                    >
+                        ‹
+                    </a>
+
+                {% endif %}
+
+                <span class="page-current">
+                    {{ page_obj.number }}
+                </span>
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?q={{ q|urlencode }}&categoria={{ categoria_id }}&marca={{ marca_id }}&estado={{ estado }}{% if solo_stock_bajo %}&stock_bajo=1{% endif %}&page={{ page_obj.next_page_number }}"
+                        class="page-button"
+                    >
+                        ›
+                    </a>
+
+                    <a
+                        href="?q={{ q|urlencode }}&categoria={{ categoria_id }}&marca={{ marca_id }}&estado={{ estado }}{% if solo_stock_bajo %}&stock_bajo=1{% endif %}&page={{ page_obj.paginator.num_pages }}"
+                        class="page-button"
+                    >
+                        »
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</section>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Compra | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}LICORERÍA HOMERO / <a href="{% url 'compras:lista' %}" style="color: inherit;">COMPRAS</a> / <strong>NUEVA COMPRA</strong>{% endblock %}
+
+{% block page_title %}Registrar Compra de Mercadería{% endblock %}
+
+{% block content %}
+<form method="post" id="compra-form">
+    {% csrf_token %}
+
+    <div class="form-card">
+        <div class="form-card-header">
+            <h3>Datos del Comprobante y Proveedor</h3>
+            <p>Información general de la factura o nota de entrega</p>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px;">
+                    <label for="{{ form.proveedor.id_for_label }}" style="margin-bottom: 0;">
+                        Proveedor <span class="required">*</span>
+                    </label>
+                    <a href="{% url 'proveedores:crear' %}" target="_blank" style="font-size: 11px; color: var(--wine); font-weight: 700;">
+                        + Nuevo proveedor
+                    </a>
+                </div>
+                {{ form.proveedor }}
+                {% if form.proveedor.errors %}
+                    <div class="form-error">{{ form.proveedor.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.numero_comprobante.id_for_label }}">
+                    N.º de Factura o Recibo
+                </label>
+                {{ form.numero_comprobante }}
+                <div class="form-help">Número fiscal o código de la nota de remisión</div>
+                {% if form.numero_comprobante.errors %}
+                    <div class="form-error">{{ form.numero_comprobante.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.observaciones.id_for_label }}">
+                Observaciones
+            </label>
+            {{ form.observaciones }}
+        </div>
+    </div>
+
+    <!-- Detalle de Productos -->
+    <div class="form-card">
+        <div class="form-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3>Detalle de Productos Ingresados</h3>
+                <p>Selecciona los licores recibidos, cantidades y costo unitario</p>
+            </div>
+            <button type="button" id="btn-add-item" class="btn btn-secondary btn-sm">
+                + Agregar producto
+            </button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="tabla-detalles">
+                <thead>
+                    <tr>
+                        <th style="min-width: 320px;">PRODUCTO</th>
+                        <th style="width: 130px;">CANTIDAD</th>
+                        <th style="width: 170px;">COSTO UNITARIO (Bs)</th>
+                        <th style="width: 170px;">SUBTOTAL (Bs)</th>
+                        <th style="width: 60px; text-align: center;"></th>
+                    </tr>
+                </thead>
+                <tbody id="detalles-body">
+                    <!-- Fila inicial -->
+                    <tr class="item-row">
+                        <td>
+                            <select name="producto_id[]" class="form-select producto-select" required onchange="actualizarCosto(this)">
+                                <option value="">-- Seleccionar producto --</option>
+                                {% for p in productos %}
+                                    <option value="{{ p.id }}" data-costo="{{ p.costo }}">
+                                        {{ p.nombre }} (Stock actual: {{ p.stock }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="cantidad[]" class="form-control item-cant" min="1" value="1" required oninput="calcularSubtotal(this)">
+                        </td>
+                        <td>
+                            <input type="number" name="costo_unitario[]" class="form-control item-costo" step="0.10" min="0" value="0.00" required oninput="calcularSubtotal(this)">
+                        </td>
+                        <td>
+                            <strong class="item-subtotal price-tag">Bs 0.00</strong>
+                        </td>
+                        <td style="text-align: center;">
+                            <button type="button" class="btn btn-danger btn-sm btn-icon" onclick="eliminarFila(this)" title="Quitar">
+                                ✕
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resumen de Totales -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 20px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line);">
+            <span style="font-size: 15px; font-weight: 700; color: #504854;">TOTAL DE LA COMPRA:</span>
+            <strong id="gran-total" style="font-size: 24px; color: var(--wine-dark); font-family: 'Manrope', sans-serif;">
+                Bs 0.00
+            </strong>
+        </div>
+    </div>
+
+    <!-- Opciones de Guardado -->
+    <div class="form-actions" style="justify-content: space-between;">
+        <a href="{% url 'compras:lista' %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" name="accion" value="borrador" class="btn btn-secondary" style="padding: 12px 20px;">
+                💾 Guardar como Borrador
+            </button>
+            <button type="submit" name="accion" value="confirmar" class="btn btn-primary" style="padding: 12px 24px;" onclick="return confirm('¿Confirmar esta compra? Las existencias se incrementarán automáticamente en el inventario.');">
+                ✓ Confirmar e Ingresar a Stock
+            </button>
+        </div>
+    </div>
+</form>
+
+<!-- Template para nueva fila -->
+<template id="fila-template">
+    <tr class="item-row">
+        <td>
+            <select name="producto_id[]" class="form-select producto-select" required onchange="actualizarCosto(this)">
+                <option value="">-- Seleccionar producto --</option>
+                {% for p in productos %}
+                    <option value="{{ p.id }}" data-costo="{{ p.costo }}">
+                        {{ p.nombre }} (Stock actual: {{ p.stock }})
+                    </option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <input type="number" name="cantidad[]" class="form-control item-cant" min="1" value="1" required oninput="calcularSubtotal(this)">
+        </td>
+        <td>
+            <input type="number" name="costo_unitario[]" class="form-control item-costo" step="0.10" min="0" value="0.00" required oninput="calcularSubtotal(this)">
+        </td>
+        <td>
+            <strong class="item-subtotal price-tag">Bs 0.00</strong>
+        </td>
+        <td style="text-align: center;">
+            <button type="button" class="btn btn-danger btn-sm btn-icon" onclick="eliminarFila(this)" title="Quitar">
+                ✕
+            </button>
+        </td>
+    </tr>
+</template>
+
+<script>
+function actualizarCosto(selectElement) {
+    const row = selectElement.closest('.item-row');
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const costo = selectedOption.getAttribute('data-costo');
+    const costoInput = row.querySelector('.item-costo');
+    if (costo && (!costoInput.value || parseFloat(costoInput.value) === 0)) {
+        costoInput.value = parseFloat(costo).toFixed(2);
+    }
+    calcularSubtotal(costoInput);
+}
+
+function calcularSubtotal(element) {
+    const row = element.closest('.item-row');
+    const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
+    const costo = parseFloat(row.querySelector('.item-costo').value) || 0;
+    const subtotal = cant * costo;
+    row.querySelector('.item-subtotal').textContent = `Bs ${subtotal.toFixed(2)}`;
+    recalcularTotal();
+}
+
+function recalcularTotal() {
+    let total = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+        const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
+        const costo = parseFloat(row.querySelector('.item-costo').value) || 0;
+        total += (cant * costo);
+    });
+    document.getElementById('gran-total').textContent = `Bs ${total.toFixed(2)}`;
+}
+
+function eliminarFila(btn) {
+    const tbody = document.getElementById('detalles-body');
+    if (tbody.querySelectorAll('.item-row').length > 1) {
+        btn.closest('.item-row').remove();
+        recalcularTotal();
+    } else {
+        alert('La compra debe contener al menos un producto.');
+    }
+}
+
+document.getElementById('btn-add-item').addEventListener('click', function() {
+    const template = document.getElementById('fila-template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById('detalles-body').appendChild(clone);
+});
+</script>
+{% endblock %}
