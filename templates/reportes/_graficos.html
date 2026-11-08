@@ -1,0 +1,196 @@
+
+<section class="report-columns">
+
+    <!-- GRÁFICO DE VENTAS -->
+    <div class="report-section">
+
+        <div class="section-heading">
+            <h2>Ventas por día</h2>
+            <span>Importes en bolivianos</span>
+        </div>
+
+        <div style="position:relative; height:300px;">
+            <canvas id="graficoVentas"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- GRÁFICO DE MÉTODOS DE PAGO -->
+    <div class="report-section">
+
+        <div class="section-heading">
+            <h2>Ingresos por método de pago</h2>
+            <span>Distribución de cobros</span>
+        </div>
+
+        <div style="position:relative; height:300px;">
+            <canvas id="graficoMetodos"></canvas>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- DATOS DE DJANGO EN FORMATO JSON -->
+
+{{ grafico_ventas_labels|json_script:"datos-ventas-labels" }}
+{{ grafico_ventas_valores|json_script:"datos-ventas-valores" }}
+
+{{ grafico_metodos_labels|json_script:"datos-metodos-labels" }}
+{{ grafico_metodos_valores|json_script:"datos-metodos-valores" }}
+
+
+<!-- LIBRERÍA CHART.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // RECUPERAR DATOS DE DJANGO
+
+    const etiquetasVentas = JSON.parse(
+        document.getElementById("datos-ventas-labels").textContent
+    );
+
+    const valoresVentas = JSON.parse(
+        document.getElementById("datos-ventas-valores").textContent
+    );
+
+    const etiquetasMetodos = JSON.parse(
+        document.getElementById("datos-metodos-labels").textContent
+    );
+
+    const valoresMetodos = JSON.parse(
+        document.getElementById("datos-metodos-valores").textContent
+    );
+
+
+    // GRÁFICO DE VENTAS POR DÍA
+
+    const elementoVentas = document.getElementById("graficoVentas");
+
+    if (elementoVentas) {
+
+        new Chart(elementoVentas, {
+
+            type: "line",
+
+            data: {
+                labels: etiquetasVentas,
+
+                datasets: [{
+                    label: "Ventas",
+                    data: valoresVentas,
+
+                    borderColor: "#701E32",
+                    backgroundColor: "rgba(112, 30, 50, 0.12)",
+
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: "#701E32"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return "Bs " +
+                                    context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback: function(value) {
+                                return "Bs " + value;
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
+
+    }
+
+
+    // GRÁFICO DE MÉTODOS DE PAGO
+
+    const elementoMetodos = document.getElementById("graficoMetodos");
+
+    if (elementoMetodos) {
+
+        new Chart(elementoMetodos, {
+
+            type: "doughnut",
+
+            data: {
+                labels: etiquetasMetodos,
+
+                datasets: [{
+                    data: valoresMetodos,
+
+                    backgroundColor: [
+                        "#701E32",
+                        "#D5A64A",
+                        "#3B82A0",
+                        "#26966B",
+                        "#8B79B5"
+                    ],
+
+                    borderWidth: 2,
+                    borderColor: "#ffffff",
+
+                    hoverOffset: 8
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ": Bs " +
+                                    context.parsed.toFixed(2);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        });
+
+    }
+
+});
+</script>

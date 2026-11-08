@@ -1,0 +1,96 @@
+
+{% extends "base.html" %}
+
+{% block title %}Nueva venta | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / VENTAS / <strong>NUEVA VENTA</strong>
+{% endblock %}
+
+{% block page_title %}
+    Registrar nueva venta
+{% endblock %}
+
+{% block content %}
+
+<section class="content-section">
+
+    <div class="section-header">
+        <div>
+            <h2>Nueva venta</h2>
+            <p>Registra una venta para comenzar a agregar productos.</p>
+        </div>
+
+        <a href="{% url 'ventas:lista' %}" class="btn btn-secondary">
+            ← Volver a ventas
+        </a>
+    </div>
+
+    <div class="form-card">
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="{{ form.metodo_pago.id_for_label }}">
+                        Método de pago
+                    </label>
+
+                    {{ form.metodo_pago }}
+
+                    {% for error in form.metodo_pago.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.descuento.id_for_label }}">
+                        Descuento general (Bs)
+                    </label>
+
+                    {{ form.descuento }}
+
+                    {% for error in form.descuento.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="{{ form.observaciones.id_for_label }}">
+                        Observaciones
+                    </label>
+
+                    {{ form.observaciones }}
+
+                    {% for error in form.observaciones.errors %}
+                        <small class="field-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'ventas:lista' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Crear venta
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

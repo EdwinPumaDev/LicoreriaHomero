@@ -1,0 +1,749 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reportes | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / <strong>REPORTES</strong>
+{% endblock %}
+
+{% block page_title %}
+    Centro de reportes
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reports-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .reports-intro {
+        color: #777;
+        font-size: 14px;
+        margin-top: -15px;
+    }
+
+    .report-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-pdf,
+    .btn-excel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 18px;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: background .2s, transform .2s;
+    }
+
+    .btn-pdf {
+        background: #701E32;
+    }
+
+    .btn-pdf:hover {
+        background: #541526;
+        transform: translateY(-2px);
+    }
+
+    .btn-excel {
+        background: #217346;
+    }
+
+    .btn-excel:hover {
+        background: #185C37;
+        transform: translateY(-2px);
+    }
+
+    .report-filter {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+    }
+
+    .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .filter-field label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+    }
+
+    .filter-field input {
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 13px;
+    }
+
+    .filter-button {
+        background: #701E32;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        padding: 11px 20px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .filter-button:hover {
+        background: #541526;
+    }
+
+    .report-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .report-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px;
+        min-width: 0;
+    }
+
+    .report-card-label {
+        color: #777;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .report-card-value {
+        color: #242424;
+        font-size: 25px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .report-card-note {
+        color: #888;
+        font-size: 12px;
+        margin-top: 9px;
+    }
+
+    .profit-value {
+        color: #218653;
+    }
+
+    .profit-value.negative {
+        color: #c0392b;
+    }
+
+    .report-section {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 22px;
+        min-width: 0;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .section-heading h2 {
+        font-size: 16px;
+        margin: 0;
+        color: #292929;
+    }
+
+    .section-heading span {
+        color: #888;
+        font-size: 12px;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .report-table th {
+        text-align: left;
+        color: #777;
+        font-weight: 600;
+        background: #fafafa;
+        padding: 12px;
+    }
+
+    .report-table td {
+        padding: 13px 12px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #444;
+    }
+
+    .report-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .empty-state {
+        color: #999;
+        text-align: center;
+        padding: 25px !important;
+    }
+
+    .report-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+        .report-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 700px) {
+        .report-grid,
+        .report-columns {
+            grid-template-columns: 1fr;
+        }
+
+        .report-filter {
+            align-items: stretch;
+        }
+
+        .filter-field,
+        .filter-field input,
+        .filter-button {
+            width: 100%;
+        }
+
+        .report-section {
+            overflow-x: auto;
+        }
+
+        .report-actions {
+            justify-content: stretch;
+        }
+
+        .btn-pdf,
+        .btn-excel {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="reports-container">
+
+    <p class="reports-intro">
+        Consulta el rendimiento de tu negocio, las ventas,
+        los ingresos y la utilidad estimada.
+    </p>
+
+    <!-- FILTRO DE FECHAS -->
+
+    <form method="get" class="report-filter">
+
+        <div class="filter-field">
+            <label for="desde">Fecha inicial</label>
+            <input
+                type="date"
+                id="desde"
+                name="desde"
+                value="{{ fecha_inicio }}"
+                required
+            >
+        </div>
+
+        <div class="filter-field">
+            <label for="hasta">Fecha final</label>
+            <input
+                type="date"
+                id="hasta"
+                name="hasta"
+                value="{{ fecha_fin }}"
+                required
+            >
+        </div>
+
+        <button type="submit" class="filter-button">
+            Consultar reportes
+        </button>
+
+    </form>
+
+    <!-- ACCIONES DE EXPORTACIÓN -->
+
+    <div class="report-actions">
+
+        <a
+            href="{% url 'reportes:exportar_pdf' %}?desde={{ fecha_inicio }}&hasta={{ fecha_fin }}"
+            class="btn-pdf"
+            target="_blank"
+        >
+            <span>▤</span>
+            Descargar PDF
+        </a>
+
+        <a
+            href="{% url 'reportes:exportar_excel' %}?desde={{ fecha_inicio }}&hasta={{ fecha_fin }}"
+            class="btn-excel"
+        >
+            <span>▦</span>
+            Descargar Excel
+        </a>
+
+    </div>
+
+    <!-- INDICADORES PRINCIPALES -->
+
+    <div class="report-grid">
+
+        <div class="report-card">
+            <div class="report-card-label">Ventas confirmadas</div>
+
+            <div class="report-card-value">
+                {{ cantidad_ventas }}
+            </div>
+
+            <div class="report-card-note">
+                Cantidad de ventas realizadas
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="report-card-label">Total vendido</div>
+
+            <div class="report-card-value">
+                Bs {{ total_ventas|floatformat:2 }}
+            </div>
+
+            <div class="report-card-note">
+                Importe de ventas confirmadas
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="report-card-label">Costos de productos</div>
+
+            <div class="report-card-value">
+                Bs {{ total_costos|floatformat:2 }}
+            </div>
+
+            <div class="report-card-note">
+                Según el costo registrado en cada venta
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="report-card-label">Utilidad estimada</div>
+
+            <div class="report-card-value profit-value {% if utilidad < 0 %}negative{% endif %}">
+                Bs {{ utilidad|floatformat:2 }}
+            </div>
+
+            <div class="report-card-note">
+                Ventas menos costos registrados
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRÁFICOS -->
+
+    <section class="report-columns">
+
+        <div class="report-section">
+
+            <div class="section-heading">
+                <h2>Ventas por día</h2>
+                <span>Importes en bolivianos</span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="graficoVentas"></canvas>
+            </div>
+
+        </div>
+
+        <div class="report-section">
+
+            <div class="section-heading">
+                <h2>Ingresos por método de pago</h2>
+                <span>Distribución de cobros</span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="graficoMetodos"></canvas>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- TABLAS -->
+
+    <div class="report-columns">
+
+        <!-- PRODUCTOS MÁS VENDIDOS -->
+
+        <section class="report-section">
+
+            <div class="section-heading">
+                <h2>Productos más vendidos</h2>
+                <span>Top 10</span>
+            </div>
+
+            <table class="report-table">
+
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-right">Cantidad</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for producto in productos_mas_vendidos %}
+
+                    <tr>
+                        <td>
+                            <strong>{{ producto.producto__nombre }}</strong>
+                            <br>
+                            <small>{{ producto.producto__codigo }}</small>
+                        </td>
+
+                        <td class="text-right">
+                            {{ producto.cantidad }}
+                        </td>
+
+                        <td class="text-right">
+                            Bs {{ producto.total|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="3" class="empty-state">
+                            No hay productos vendidos en este periodo.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- MÉTODOS DE PAGO -->
+
+        <section class="report-section">
+
+            <div class="section-heading">
+                <h2>Ingresos por método de pago</h2>
+                <span>Distribución de cobros</span>
+            </div>
+
+            <table class="report-table">
+
+                <thead>
+                    <tr>
+                        <th>Método de pago</th>
+                        <th class="text-right">Operaciones</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for metodo in metodos_pago %}
+
+                    <tr>
+                        <td>{{ metodo.metodo_pago }}</td>
+
+                        <td class="text-right">
+                            {{ metodo.cantidad }}
+                        </td>
+
+                        <td class="text-right">
+                            Bs {{ metodo.total|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="3" class="empty-state">
+                            No existen ingresos registrados en este periodo.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
+
+                <span style="color:#777; font-size:13px;">
+                    Total de ingresos válidos
+                </span>
+
+                <strong style="float:right;">
+                    Bs {{ total_ingresos|floatformat:2 }}
+                </strong>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- RESUMEN DE VENTAS POR DÍA -->
+
+    <section class="report-section">
+
+        <div class="section-heading">
+            <h2>Resumen de ventas por día</h2>
+            <span>Periodo consultado</span>
+        </div>
+
+        <table class="report-table">
+
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th class="text-right">Ventas realizadas</th>
+                    <th class="text-right">Total vendido</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for dia in ventas_por_dia %}
+
+                <tr>
+                    <td>{{ dia.fecha__date|date:"d/m/Y" }}</td>
+
+                    <td class="text-right">
+                        {{ dia.cantidad }}
+                    </td>
+
+                    <td class="text-right">
+                        Bs {{ dia.total|floatformat:2 }}
+                    </td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="3" class="empty-state">
+                        No hay ventas confirmadas en el periodo seleccionado.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+{{ grafico_ventas_labels|json_script:"datos-ventas-labels" }}
+{{ grafico_ventas_valores|json_script:"datos-ventas-valores" }}
+
+{{ grafico_metodos_labels|json_script:"datos-metodos-labels" }}
+{{ grafico_metodos_valores|json_script:"datos-metodos-valores" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const etiquetasVentas = JSON.parse(
+        document.getElementById("datos-ventas-labels").textContent
+    );
+
+    const valoresVentas = JSON.parse(
+        document.getElementById("datos-ventas-valores").textContent
+    );
+
+    const etiquetasMetodos = JSON.parse(
+        document.getElementById("datos-metodos-labels").textContent
+    );
+
+    const valoresMetodos = JSON.parse(
+        document.getElementById("datos-metodos-valores").textContent
+    );
+
+    // GRÁFICO DE VENTAS POR DÍA
+
+    const elementoVentas = document.getElementById("graficoVentas");
+
+    if (elementoVentas) {
+
+        new Chart(elementoVentas, {
+
+            type: "line",
+
+            data: {
+                labels: etiquetasVentas,
+
+                datasets: [{
+                    label: "Ventas",
+                    data: valoresVentas,
+
+                    borderColor: "#701E32",
+                    backgroundColor: "rgba(112, 30, 50, 0.12)",
+
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: "#701E32"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return "Bs " +
+                                    context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            callback: function(value) {
+                                return "Bs " + value;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        });
+
+    }
+
+    // GRÁFICO DE MÉTODOS DE PAGO
+
+    const elementoMetodos = document.getElementById("graficoMetodos");
+
+    if (elementoMetodos) {
+
+        new Chart(elementoMetodos, {
+
+            type: "doughnut",
+
+            data: {
+                labels: etiquetasMetodos,
+
+                datasets: [{
+                    data: valoresMetodos,
+
+                    backgroundColor: [
+                        "#701E32",
+                        "#D5A64A",
+                        "#3B82A0",
+                        "#26966B",
+                        "#8B79B5"
+                    ],
+
+                    borderWidth: 2,
+                    borderColor: "#ffffff",
+                    hoverOffset: 8
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ": Bs " +
+                                    context.parsed.toFixed(2);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        });
+
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,167 @@
+
+{% extends "base.html" %}
+
+{% block title %}Editar usuario | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / USUARIOS / <strong>EDITAR</strong>
+{% endblock %}
+
+{% block page_title %}
+    Editar usuario
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 850px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+    }
+
+    .form-description {
+        color: #777;
+        margin: 6px 0 25px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: #701E32;
+        box-shadow: 0 0 0 3px rgba(112,30,50,.08);
+    }
+
+    .field-error {
+        color: #b42318;
+        font-size: 12px;
+    }
+
+    .form-errors {
+        background: #fff0f0;
+        color: #b42318;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .btn-save,
+    .btn-cancel {
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-save {
+        background: #701E32;
+        color: #fff;
+    }
+
+    .btn-cancel {
+        background: #f1f1f1;
+        color: #555;
+    }
+
+    @media(max-width: 650px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+
+    <h2>Información del usuario</h2>
+
+    <p class="form-description">
+        Modifica los datos de la cuenta de {{ usuario.username }}.
+    </p>
+
+    {% if formulario.non_field_errors %}
+        <div class="form-errors">
+            {{ formulario.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            {% for field in formulario %}
+            <div class="form-group">
+
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% for error in field.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'usuarios:lista' %}" class="btn-cancel">
+                Cancelar
+            </a>
+
+            <button type="submit" class="btn-save">
+                Guardar cambios
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

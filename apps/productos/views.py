@@ -10,9 +10,14 @@ from django.views.decorators.http import require_POST
 
 from apps.productos.forms import CategoriaForm, MarcaForm, ProductoForm
 from apps.productos.models import Categoria, Marca, Producto
+from apps.usuarios.permisos import (
+    todos_los_cargos,
+    administrador_o_encargado,
+)
 
 
 @login_required
+@todos_los_cargos
 def lista_productos(request):
     q = request.GET.get("q", "").strip()
     categoria_id = request.GET.get("categoria", "")
@@ -90,6 +95,7 @@ def lista_productos(request):
 
 
 @login_required
+@administrador_o_encargado
 def crear_producto(request):
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES)
@@ -119,6 +125,7 @@ def crear_producto(request):
 
 
 @login_required
+@administrador_o_encargado
 def editar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
 
@@ -155,6 +162,7 @@ def editar_producto(request, pk):
 
 
 @login_required
+@administrador_o_encargado
 @require_POST
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
@@ -184,6 +192,7 @@ def eliminar_producto(request, pk):
 
 
 @login_required
+@administrador_o_encargado
 def categorias_marcas(request):
     form_cat = CategoriaForm()
     form_marca = MarcaForm()
@@ -237,6 +246,7 @@ def categorias_marcas(request):
 # ==========================================
 
 @login_required
+@administrador_o_encargado
 def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
 
@@ -269,6 +279,7 @@ def editar_categoria(request, pk):
 
 
 @login_required
+@administrador_o_encargado
 def editar_marca(request, pk):
     marca = get_object_or_404(Marca, pk=pk)
 
@@ -305,6 +316,7 @@ def editar_marca(request, pk):
 # ==========================================
 
 @login_required
+@administrador_o_encargado
 @require_POST
 def cambiar_estado_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
@@ -327,6 +339,7 @@ def cambiar_estado_categoria(request, pk):
 
 
 @login_required
+@administrador_o_encargado
 @require_POST
 def cambiar_estado_marca(request, pk):
     marca = get_object_or_404(Marca, pk=pk)

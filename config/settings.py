@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -55,6 +54,11 @@ INSTALLED_APPS = [
     "apps.ventas.apps.VentasConfig",
     "apps.caja.apps.CajaConfig",
     "apps.reportes.apps.ReportesConfig",
+    "apps.auditoria.apps.AuditoriaConfig",
+    "apps.configuracion.apps.ConfiguracionConfig",
+
+    # Página pública
+    "apps.publico.apps.PublicoConfig",
 ]
 
 
@@ -89,6 +93,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.configuracion.context_processors.configuracion_global",
             ],
         },
     },

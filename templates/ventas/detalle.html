@@ -1,0 +1,779 @@
+
+{% extends "base.html" %}
+
+{% block title %}Detalle de venta | Licorería Homero{% endblock %}
+
+{% block content %}
+<style>
+    .sales-detail {
+        max-width: 1250px;
+        margin: 0 auto;
+        color: #292d32;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+        font-weight: 750;
+        margin: 0 0 6px;
+    }
+
+    .page-header p {
+        color: #777;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border-radius: 9px;
+        border: none;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        opacity: .9;
+    }
+
+    .btn-back { background: #f0f1f3; color: #444; }
+    .btn-primary { background: #701e32; color: white; }
+    .btn-success { background: #16834b; color: white; }
+    .btn-danger { background: #bd3545; color: white; }
+    .btn-outline { background: white; border: 1px solid #ddd; color: #444; }
+    .btn-pdf { background: #701e32; color: white; }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid #e9e9ec;
+        border-radius: 13px;
+        padding: 22px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.035);
+    }
+
+    .card-title {
+        font-size: 16px;
+        font-weight: 750;
+        margin: 0 0 18px;
+        padding-bottom: 13px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .info-item small {
+        display: block;
+        color: #888;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .info-item strong {
+        font-size: 14px;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 750;
+    }
+
+    .status-confirmada { background: #e2f5e9; color: #16834b; }
+    .status-borrador { background: #fff2d8; color: #a66b00; }
+    .status-anulada { background: #fde5e7; color: #bd3545; }
+
+    .table-container { overflow-x: auto; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 560px;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px 10px;
+        background: #f8f8fa;
+        color: #777;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+    }
+
+    .text-right { text-align: right; }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 10px;
+        color: #888;
+        font-size: 13px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 650;
+        margin-bottom: 7px;
+        color: #555;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        font-size: 13px;
+        outline: none;
+        font-family: inherit;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 95px;
+        line-height: 1.5;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #701e32;
+        box-shadow: 0 0 0 3px rgba(112,30,50,.08);
+    }
+
+    .form-group input[readonly] {
+        background: #f7f7f8;
+        color: #555;
+    }
+
+    .search-hint {
+        font-size: 11px;
+        color: #888;
+        margin-top: 5px;
+    }
+
+    .product-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .subtotal-preview {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f3f4;
+        border: 1px solid #ead9dd;
+        padding: 13px 15px;
+        border-radius: 9px;
+        margin: 5px 0 15px;
+        font-size: 13px;
+    }
+
+    .subtotal-preview strong {
+        color: #701e32;
+        font-size: 18px;
+    }
+
+    .totals {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .total-final {
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+        color: #292d32;
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    .total-final strong { color: #701e32; }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 20px;
+    }
+
+    .receipt-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .receipt-actions .btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .notice {
+        background: #fff8e9;
+        color: #89621c;
+        border: 1px solid #f4e4bd;
+        border-radius: 9px;
+        padding: 12px;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-top: 15px;
+    }
+
+    .observations {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .field-errors {
+        color: #bd3545;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .error-message {
+        background: #fff0f0;
+        color: #a52d3b;
+        border: 1px solid #f2c8ce;
+        border-radius: 9px;
+        padding: 13px 15px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .cancel-box {
+        margin-top: 20px;
+        padding: 16px;
+        border: 1px solid #f0d8dc;
+        background: #fffafb;
+        border-radius: 10px;
+    }
+
+    .cancel-box h4 {
+        margin: 0 0 7px;
+        color: #9f2d3e;
+        font-size: 14px;
+    }
+
+    .cancel-box p {
+        margin: 0 0 14px;
+        color: #777;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .required-label {
+        color: #bd3545;
+    }
+
+    .cancel-box .btn {
+        width: 100%;
+    }
+
+    @media (max-width: 850px) {
+        .detail-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 550px) {
+        .page-header h1 { font-size: 22px; }
+        .card { padding: 16px; }
+        .info-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+        .product-fields { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="sales-detail">
+
+    <div class="page-header">
+        <div>
+            <h1>Detalle de venta</h1>
+            <p>Consulta la información y los productos de esta venta.</p>
+        </div>
+
+        <a href="{% url 'ventas:lista' %}" class="btn btn-back">
+            ← Volver a ventas
+        </a>
+    </div>
+
+    {% if error %}
+        <div class="error-message">
+            <strong>Atención:</strong> {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="detail-grid">
+
+        <div>
+
+            <!-- INFORMACIÓN -->
+            <div class="card">
+                <h3 class="card-title">Información de la venta</h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <small>Número de venta</small>
+                        <strong>{{ venta.numero }}</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <small>Fecha</small>
+                        <strong>{{ venta.fecha|date:"d/m/Y H:i" }}</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <small>Estado</small>
+                        <strong>
+                            {% if venta.estado == "CONFIRMADA" %}
+                                <span class="status status-confirmada">Confirmada</span>
+                            {% elif venta.estado == "ANULADA" %}
+                                <span class="status status-anulada">Anulada</span>
+                            {% else %}
+                                <span class="status status-borrador">Borrador</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="info-item">
+                        <small>Método de pago</small>
+                        <strong>{{ venta.get_metodo_pago_display }}</strong>
+                    </div>
+
+                    <div class="info-item">
+                        <small>Registrado por</small>
+                        <strong>{{ venta.usuario }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS AGREGADOS -->
+            <div class="card">
+                <h3 class="card-title">Productos de la venta</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-right">Cantidad</th>
+                                <th class="text-right">Precio</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for detalle in detalles %}
+                            <tr>
+                                <td><strong>{{ detalle.producto.nombre }}</strong></td>
+                                <td class="text-right">{{ detalle.cantidad }}</td>
+                                <td class="text-right">Bs {{ detalle.precio_unitario|floatformat:2 }}</td>
+                                <td class="text-right">
+                                    <strong>Bs {{ detalle.subtotal|floatformat:2 }}</strong>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-state">
+                                    Todavía no se agregaron productos a esta venta.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- AGREGAR PRODUCTO -->
+            {% if venta.estado == "BORRADOR" %}
+            <div class="card">
+                <h3 class="card-title">Agregar producto</h3>
+
+                <form method="post" id="formAgregarProducto">
+                    {% csrf_token %}
+
+                    {% if detalle_form.non_field_errors %}
+                        <div class="field-errors">
+                            {{ detalle_form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="buscarProducto">Buscar producto</label>
+                        <input
+                            type="text"
+                            id="buscarProducto"
+                            placeholder="Escribe el nombre o código del producto..."
+                            autocomplete="off"
+                        >
+                        <div class="search-hint">
+                            Puedes buscar por nombre o código. Después selecciona el producto.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ detalle_form.producto.id_for_label }}">
+                            Producto
+                        </label>
+                        {{ detalle_form.producto }}
+                        {% if detalle_form.producto.errors %}
+                            <div class="field-errors">{{ detalle_form.producto.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-fields">
+                        <div class="form-group">
+                            <label for="{{ detalle_form.precio_unitario.id_for_label }}">
+                                Precio unitario (Bs)
+                            </label>
+                            {{ detalle_form.precio_unitario }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ detalle_form.cantidad.id_for_label }}">
+                                Cantidad
+                            </label>
+                            {{ detalle_form.cantidad }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ detalle_form.descuento.id_for_label }}">
+                                Descuento (Bs)
+                            </label>
+                            {{ detalle_form.descuento }}
+                        </div>
+                    </div>
+
+                    <div class="subtotal-preview">
+                        <span>Subtotal estimado</span>
+                        <strong id="subtotalEstimado">Bs 0.00</strong>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        + Agregar producto a la venta
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            {% if venta.observaciones %}
+            <div class="card">
+                <h3 class="card-title">Observaciones</h3>
+                <div class="observations">{{ venta.observaciones }}</div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- COLUMNA DERECHA -->
+        <div>
+
+            <div class="card">
+                <h3 class="card-title">Resumen de la venta</h3>
+
+                <div class="totals">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <strong>Bs {{ venta.subtotal|floatformat:2 }}</strong>
+                    </div>
+
+                    <div class="total-row">
+                        <span>Descuento</span>
+                        <strong>Bs {{ venta.descuento|floatformat:2 }}</strong>
+                    </div>
+
+                    <div class="total-row total-final">
+                        <span>Total</span>
+                        <strong>Bs {{ venta.total|floatformat:2 }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCIONES -->
+            <div class="card">
+                <h3 class="card-title">Acciones</h3>
+
+                {% if venta.estado == "BORRADOR" %}
+
+                    <p style="font-size:13px; color:#777; line-height:1.5;">
+                        Revisa los productos y el total antes de confirmar la venta.
+                    </p>
+
+                    <div class="actions">
+                        <form method="post"
+                              action="{% url 'ventas:confirmar' venta.pk %}"
+                              onsubmit="return confirm('¿Estás seguro de confirmar esta venta? Se descontará el stock del inventario.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">
+                                ✓ Confirmar venta
+                            </button>
+                        </form>
+                    </div>
+
+                {% elif venta.estado == "CONFIRMADA" %}
+
+                    <p style="font-size:13px; color:#777; line-height:1.5;">
+                        La venta está confirmada. Puedes consultar o descargar su comprobante.
+                    </p>
+
+                    <div class="receipt-actions">
+                        <a href="{% url 'ventas:ver_comprobante' venta.pk %}"
+                           class="btn btn-pdf">
+                            ◉ Ver comprobante
+                        </a>
+
+                        <a href="{% url 'ventas:comprobante' venta.pk %}?descargar=1"
+                           class="btn btn-outline">
+                            ↓ Descargar PDF
+                        </a>
+                    </div>
+
+                    <div class="notice">
+                        Esta venta ya fue confirmada y su stock fue descontado del inventario.
+                    </div>
+
+                    <!-- FORMULARIO DE ANULACIÓN CON MOTIVO OBLIGATORIO -->
+                    <div class="cancel-box">
+
+                        <h4>⚠ Anular venta</h4>
+
+                        <p>
+                            Esta acción devolverá los productos al inventario
+                            y anulará el ingreso relacionado en Caja.
+                            Debes indicar el motivo.
+                        </p>
+
+                        <form
+                            method="post"
+                            action="{% url 'ventas:anular' venta.pk %}"
+                            id="formAnularVenta"
+                        >
+                            {% csrf_token %}
+
+                            <div class="form-group">
+                                <label for="motivo">
+                                    Motivo de anulación
+                                    <span class="required-label">*</span>
+                                </label>
+
+                                <textarea
+                                    name="motivo"
+                                    id="motivo"
+                                    placeholder="Escribe por qué se está anulando esta venta..."
+                                    minlength="5"
+                                    maxlength="500"
+                                    required
+                                ></textarea>
+
+                                <div class="search-hint">
+                                    Campo obligatorio. Escribe al menos 5 caracteres.
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger">
+                                Anular venta
+                            </button>
+                        </form>
+
+                    </div>
+
+                {% elif venta.estado == "ANULADA" %}
+
+                    <div class="notice">
+                        Esta venta fue anulada. El stock correspondiente fue devuelto al inventario.
+                    </div>
+
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if venta.estado == "BORRADOR" %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const buscador = document.getElementById("buscarProducto");
+    const selector = document.getElementById("id_producto");
+    const precio = document.getElementById("id_precio_unitario");
+    const cantidad = document.getElementById("id_cantidad");
+    const descuento = document.getElementById("id_descuento");
+    const subtotalEstimado = document.getElementById("subtotalEstimado");
+
+    if (!buscador || !selector || !precio || !cantidad || !descuento) {
+        return;
+    }
+
+    // Guardar las opciones originales del selector.
+    const opcionesOriginales = Array.from(selector.options).map(function(opcion) {
+        return opcion.cloneNode(true);
+    });
+
+    // Buscar productos por nombre o código.
+    buscador.addEventListener("input", function () {
+        const texto = buscador.value.toLowerCase().trim();
+        const valorSeleccionado = selector.value;
+
+        selector.innerHTML = "";
+
+        opcionesOriginales.forEach(function(opcion) {
+            const nombre = opcion.textContent.toLowerCase();
+            const codigo = (opcion.dataset.codigo || "").toLowerCase();
+
+            if (
+                opcion.value === "" ||
+                nombre.includes(texto) ||
+                codigo.includes(texto)
+            ) {
+                selector.appendChild(opcion.cloneNode(true));
+            }
+        });
+
+        if (
+            Array.from(selector.options).some(function(opcion) {
+                return opcion.value === valorSeleccionado;
+            })
+        ) {
+            selector.value = valorSeleccionado;
+        } else {
+            selector.value = "";
+            precio.value = "";
+        }
+
+        calcularSubtotal();
+    });
+
+    // Obtener el precio del producto seleccionado.
+    function actualizarPrecio() {
+        const opcion = selector.options[selector.selectedIndex];
+
+        if (opcion && opcion.value !== "") {
+            precio.value = opcion.dataset.precio || "0";
+        } else {
+            precio.value = "";
+        }
+
+        calcularSubtotal();
+    }
+
+    // Calcular subtotal estimado.
+    function calcularSubtotal() {
+        const precioUnitario = parseFloat(precio.value) || 0;
+        const unidades = parseFloat(cantidad.value) || 0;
+        const descuentoValor = parseFloat(descuento.value) || 0;
+
+        let resultado = (precioUnitario * unidades) - descuentoValor;
+
+        if (resultado < 0) {
+            resultado = 0;
+        }
+
+        subtotalEstimado.textContent = "Bs " + resultado.toFixed(2);
+    }
+
+    selector.addEventListener("change", actualizarPrecio);
+    cantidad.addEventListener("input", calcularSubtotal);
+    descuento.addEventListener("input", calcularSubtotal);
+
+    // Inicializar valores.
+    actualizarPrecio();
+});
+</script>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const formulario = document.getElementById("formAnularVenta");
+    const motivo = document.getElementById("motivo");
+
+    if (!formulario || !motivo) {
+        return;
+    }
+
+    formulario.addEventListener("submit", function (evento) {
+
+        const texto = motivo.value.trim();
+
+        if (texto.length < 5) {
+            evento.preventDefault();
+            motivo.setCustomValidity(
+                "Debes escribir un motivo de al menos 5 caracteres."
+            );
+            motivo.reportValidity();
+            motivo.focus();
+            return;
+        }
+
+        motivo.setCustomValidity("");
+
+        const confirmar = window.confirm(
+            "¿Estás seguro de anular esta venta? El stock será devuelto al inventario y el ingreso de Caja será anulado."
+        );
+
+        if (!confirmar) {
+            evento.preventDefault();
+        }
+    });
+
+    motivo.addEventListener("input", function () {
+        motivo.setCustomValidity("");
+    });
+
+});
+</script>
+
+{% endblock %}

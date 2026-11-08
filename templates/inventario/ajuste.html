@@ -1,0 +1,86 @@
+
+{% extends "base.html" %}
+
+{% block title %}Nuevo ajuste | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO / INVENTARIO / <strong>NUEVO AJUSTE</strong>
+{% endblock %}
+
+{% block page_title %}Registrar ajuste de inventario{% endblock %}
+
+{% block content %}
+
+<div class="toolbar">
+    <p style="color: var(--muted); font-size: 13px;">
+        Registra entradas o salidas manuales de productos.
+    </p>
+
+    <a href="{% url 'inventario:lista' %}" class="btn btn-secondary">
+        ← Volver al inventario
+    </a>
+</div>
+
+<section class="content-card" style="max-width: 850px;">
+
+    <div class="card-heading">
+        <div>
+            <h2>Datos del ajuste</h2>
+            <p>Completa la información del movimiento.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div style="display: grid; gap: 20px;">
+
+            <div>
+                <label for="{{ form.producto.id_for_label }}">Producto</label>
+                {{ form.producto }}
+                {{ form.producto.errors }}
+            </div>
+
+            <div>
+                <label for="{{ form.tipo.id_for_label }}">Tipo de movimiento</label>
+                {{ form.tipo }}
+                {{ form.tipo.errors }}
+            </div>
+
+            <div>
+                <label for="{{ form.cantidad.id_for_label }}">Cantidad</label>
+                {{ form.cantidad }}
+                {{ form.cantidad.errors }}
+            </div>
+
+            <div>
+                <label for="{{ form.motivo.id_for_label }}">Motivo del ajuste</label>
+                {{ form.motivo }}
+                {{ form.motivo.errors }}
+            </div>
+
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button type="submit" class="btn btn-primary">
+                Guardar ajuste
+            </button>
+
+            <a href="{% url 'inventario:lista' %}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -6,9 +7,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.proveedores.forms import ProveedorForm
 from apps.proveedores.models import Proveedor
+from apps.usuarios.permisos import administrador_o_encargado
 
 
 @login_required
+@administrador_o_encargado
 def lista_proveedores(request):
     q = request.GET.get("q", "").strip()
     estado = request.GET.get("estado", "activos")
@@ -54,15 +57,19 @@ def lista_proveedores(request):
 
 
 @login_required
+@administrador_o_encargado
 def crear_proveedor(request):
     if request.method == "POST":
         form = ProveedorForm(request.POST)
+
         if form.is_valid():
             proveedor = form.save()
+
             messages.success(
                 request,
                 f"Proveedor '{proveedor.nombre}' registrado correctamente.",
             )
+
             return redirect("proveedores:lista")
     else:
         form = ProveedorForm()
@@ -79,17 +86,21 @@ def crear_proveedor(request):
 
 
 @login_required
+@administrador_o_encargado
 def editar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
 
     if request.method == "POST":
         form = ProveedorForm(request.POST, instance=proveedor)
+
         if form.is_valid():
             proveedor = form.save()
+
             messages.success(
                 request,
                 f"Datos del proveedor '{proveedor.nombre}' actualizados correctamente.",
             )
+
             return redirect("proveedores:lista")
     else:
         form = ProveedorForm(instance=proveedor)
@@ -107,12 +118,14 @@ def editar_proveedor(request, pk):
 
 
 @login_required
+@administrador_o_encargado
 def eliminar_proveedor(request, pk):
     proveedor = get_object_or_404(Proveedor, pk=pk)
 
     if proveedor.compras.exists():
         proveedor.activo = False
         proveedor.save()
+
         messages.warning(
             request,
             f"El proveedor '{proveedor.nombre}' tiene compras asociadas en el sistema. Ha sido marcado como inactivo.",
@@ -120,8 +133,10 @@ def eliminar_proveedor(request, pk):
     else:
         nombre = proveedor.nombre
         proveedor.delete()
+
         messages.success(
-            request, f"El proveedor '{nombre}' ha sido eliminado exitosamente."
+            request,
+            f"El proveedor '{nombre}' ha sido eliminado exitosamente.",
         )
 
     return redirect("proveedores:lista")

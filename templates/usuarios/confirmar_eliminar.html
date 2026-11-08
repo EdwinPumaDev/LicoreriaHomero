@@ -1,0 +1,120 @@
+
+{% extends "base.html" %}
+
+{% block title %}Eliminar usuario | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / USUARIOS / <strong>ELIMINAR</strong>
+{% endblock %}
+
+{% block page_title %}
+    Eliminar usuario
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 620px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 32px;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.05);
+        text-align: center;
+    }
+
+    .delete-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff0f0;
+        color: #b42318;
+        border-radius: 50%;
+        font-size: 30px;
+    }
+
+    .delete-container p {
+        color: #666;
+        line-height: 1.7;
+    }
+
+    .warning {
+        background: #fff7ed;
+        color: #9a4d00;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 22px 0;
+        font-size: 13px;
+        text-align: left;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn-delete,
+    .btn-cancel {
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-delete {
+        background: #b42318;
+        color: #fff;
+    }
+
+    .btn-cancel {
+        background: #f1f1f1;
+        color: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+
+    <div class="delete-icon">!</div>
+
+    <h2>¿Eliminar este usuario?</h2>
+
+    <p>
+        Estás a punto de eliminar la cuenta:
+        <strong>{{ usuario.username }}</strong>
+    </p>
+
+    <p>
+        {{ usuario.get_full_name|default:"Sin nombre registrado" }}
+    </p>
+
+    <div class="warning">
+        <strong>Advertencia:</strong>
+        Esta acción es permanente. El usuario ya no podrá ingresar
+        al sistema. Los registros históricos relacionados pueden
+        impedir la eliminación para proteger la información del negocio.
+    </div>
+
+    <form method="post" class="delete-actions">
+        {% csrf_token %}
+
+        <a href="{% url 'usuarios:lista' %}" class="btn-cancel">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn-delete">
+            Sí, eliminar usuario
+        </button>
+    </form>
+
+</div>
+{% endblock %}

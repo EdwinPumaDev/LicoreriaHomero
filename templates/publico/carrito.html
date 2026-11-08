@@ -1,0 +1,448 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi carrito | Licorería Homero</title>
+
+    <style>
+        :root {
+            --vino: #701E32;
+            --vino-oscuro: #4B1423;
+            --dorado: #D6AD60;
+            --fondo: #F7F5F2;
+            --blanco: #FFFFFF;
+            --texto: #292929;
+            --gris: #777777;
+            --borde: #E9E3DE;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+        }
+
+        header {
+            background: var(--vino-oscuro);
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .marca {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        header nav {
+            display: flex;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        header a:hover {
+            color: var(--dorado);
+        }
+
+        .contenedor {
+            width: min(1100px, 90%);
+            margin: 45px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 28px;
+        }
+
+        .encabezado h1 {
+            font-size: 32px;
+            color: var(--vino);
+            margin-bottom: 8px;
+        }
+
+        .encabezado p {
+            color: var(--gris);
+        }
+
+        .mensaje {
+            padding: 13px 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            background: #EFE8DF;
+            color: var(--vino-oscuro);
+        }
+
+        .contenido {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .productos,
+        .resumen {
+            background: var(--blanco);
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .producto {
+            display: grid;
+            grid-template-columns: 95px 1fr auto;
+            gap: 18px;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .producto:last-child {
+            border-bottom: none;
+        }
+
+        .imagen {
+            width: 95px;
+            height: 105px;
+            background: #F4F0EC;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 35px;
+        }
+
+        .imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .info h3 {
+            font-size: 17px;
+            margin-bottom: 7px;
+        }
+
+        .info p {
+            font-size: 13px;
+            color: var(--gris);
+            margin-bottom: 7px;
+        }
+
+        .precio {
+            color: var(--vino);
+            font-weight: bold;
+        }
+
+        .acciones {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .form-cantidad {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .form-cantidad input {
+            width: 65px;
+            padding: 8px;
+            border: 1px solid var(--borde);
+            border-radius: 6px;
+        }
+
+        button,
+        .boton {
+            border: none;
+            border-radius: 6px;
+            padding: 9px 13px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .actualizar {
+            background: var(--vino);
+            color: white;
+        }
+
+        .eliminar {
+            background: #F8E9E9;
+            color: #A12626;
+        }
+
+        .resumen h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .fila {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--gris);
+            font-size: 14px;
+        }
+
+        .total {
+            border-top: 1px solid var(--borde);
+            padding-top: 17px;
+            margin-top: 17px;
+            color: var(--texto);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .finalizar {
+            display: block;
+            text-align: center;
+            background: var(--vino);
+            color: white;
+            padding: 14px;
+            border-radius: 7px;
+            text-decoration: none;
+            margin-top: 22px;
+            font-weight: bold;
+        }
+
+        .finalizar:hover,
+        .actualizar:hover {
+            background: var(--vino-oscuro);
+        }
+
+        .seguir {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--vino);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .vacio {
+            background: white;
+            padding: 55px 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--borde);
+        }
+
+        .vacio .icono {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .vacio h2 {
+            color: var(--vino);
+            margin-bottom: 10px;
+        }
+
+        .vacio p {
+            color: var(--gris);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 750px) {
+            .contenido {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .producto {
+                grid-template-columns: 75px 1fr;
+            }
+
+            .imagen {
+                width: 75px;
+                height: 85px;
+            }
+
+            .producto-subtotal {
+                grid-column: 2;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="marca">🍷 LICORERÍA HOMERO</div>
+
+    <nav>
+        <a href="{% url 'publico:inicio' %}">Inicio</a>
+        <a href="{% url 'publico:catalogo' %}">Catálogo</a>
+        <a href="{% url 'publico:carrito' %}">Mi carrito</a>
+    </nav>
+</header>
+
+<main class="contenedor">
+
+    <div class="encabezado">
+        <h1>Mi carrito</h1>
+        <p>Revisa tus productos antes de realizar tu pedido.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mensaje">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if productos_carrito %}
+
+        <div class="contenido">
+
+            <section class="productos">
+
+                {% for item in productos_carrito %}
+
+                    <article class="producto">
+
+                        <div class="imagen">
+                            {% if item.producto.imagen %}
+                                <img src="{{ item.producto.imagen.url }}"
+                                     alt="{{ item.producto.nombre }}">
+                            {% else %}
+                                🍾
+                            {% endif %}
+                        </div>
+
+                        <div class="info">
+                            <h3>{{ item.producto.nombre }}</h3>
+
+                            <p>
+                                Precio unitario:
+                                Bs {{ item.producto.precio_venta|floatformat:2 }}
+                            </p>
+
+                            <p>
+                                Disponible: {{ item.producto.stock }} unidades
+                            </p>
+
+                            <div class="acciones">
+
+                                <form method="POST"
+                                      action="{% url 'publico:actualizar_carrito' item.producto.id %}"
+                                      class="form-cantidad">
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="number"
+                                        name="cantidad"
+                                        value="{{ item.cantidad }}"
+                                        min="1"
+                                        max="{{ item.producto.stock }}"
+                                        required
+                                    >
+
+                                    <button type="submit" class="actualizar">
+                                        Actualizar
+                                    </button>
+
+                                </form>
+
+                                <form method="POST"
+                                      action="{% url 'publico:eliminar_carrito' item.producto.id %}">
+
+                                    {% csrf_token %}
+
+                                    <button type="submit" class="eliminar">
+                                        Eliminar
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        </div>
+
+                        <div class="producto-subtotal">
+                            <strong>
+                                Bs {{ item.subtotal|floatformat:2 }}
+                            </strong>
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+            <aside class="resumen">
+
+                <h2>Resumen del pedido</h2>
+
+                <div class="fila">
+                    <span>Productos</span>
+                    <span>{{ cantidad_total }}</span>
+                </div>
+
+                <div class="fila total">
+                    <span>Total</span>
+                    <span>Bs {{ total|floatformat:2 }}</span>
+                </div>
+
+                <a href="{% url 'publico:catalogo' %}" class="seguir">
+                    ← Seguir comprando
+                </a>
+
+                <a href="#" class="finalizar">
+                    Continuar con el pedido
+                </a>
+
+            </aside>
+
+        </div>
+
+    {% else %}
+
+        <section class="vacio">
+            <div class="icono">🛒</div>
+
+            <h2>Tu carrito está vacío</h2>
+
+            <p>
+                Todavía no agregaste productos.
+                Explora nuestro catálogo y encuentra lo que buscas.
+            </p>
+
+            <a href="{% url 'publico:catalogo' %}" class="finalizar">
+                Explorar catálogo
+            </a>
+        </section>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

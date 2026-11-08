@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoría | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / <strong>AUDITORÍA</strong>
+{% endblock %}
+
+{% block page_title %}
+    Auditoría
+{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+
+    <!-- DESCRIPCIÓN -->
+    <div class="section-header">
+        <div>
+            <p>Consulta las acciones realizadas por los usuarios del sistema.</p>
+        </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-info">
+                <span>Total de registros</span>
+                <h3>{{ total_registros }}</h3>
+                <small>Actividades almacenadas</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="table-container">
+
+        <div class="table-header">
+            <h3>Historial de movimientos</h3>
+            <span>{{ total_registros }} registro(s)</span>
+        </div>
+
+        <div class="table-responsive">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Tipo de acción</th>
+                        <th>Módulo</th>
+                        <th>Descripción</th>
+                        <th>Dirección IP</th>
+                        <th>Fecha y hora</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for registro in registros %}
+
+                    <tr>
+                        <td>{{ registro.id }}</td>
+
+                        <td>
+                            {% if registro.usuario %}
+                                <strong>{{ registro.usuario.username }}</strong>
+                            {% else %}
+                                Sistema
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ registro.get_tipo_accion_display }}
+                        </td>
+
+                        <td>
+                            {{ registro.modulo }}
+                        </td>
+
+                        <td>
+                            {{ registro.descripcion }}
+                        </td>
+
+                        <td>
+                            {{ registro.direccion_ip|default:"No disponible" }}
+                        </td>
+
+                        <td>
+                            {{ registro.fecha_hora|date:"d/m/Y H:i:s" }}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No existen registros de auditoría.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

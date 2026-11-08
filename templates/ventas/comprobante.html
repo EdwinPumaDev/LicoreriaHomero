@@ -1,0 +1,585 @@
+
+{% extends "base.html" %}
+
+{% block title %}Comprobante {{ venta.numero }} | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / VENTAS / <strong>COMPROBANTE</strong>
+{% endblock %}
+
+{% block page_title %}Comprobante de venta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .receipt-page {
+        max-width: 900px;
+        margin: 0 auto;
+        display: grid;
+        gap: 20px;
+    }
+
+    .receipt-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .receipt-toolbar p {
+        margin: 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .receipt-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .receipt-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 17px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .receipt-back {
+        color: #701e32;
+        background: #fff;
+        border: 1px solid #eadde1;
+    }
+
+    .receipt-back:hover {
+        background: #f8edf0;
+    }
+
+    .receipt-download {
+        color: white;
+        background: #701e32;
+        border: 1px solid #701e32;
+    }
+
+    .receipt-download:hover {
+        background: #541426;
+        transform: translateY(-1px);
+    }
+
+    .receipt-paper {
+        background: white;
+        border: 1px solid #eae6e8;
+        border-radius: 15px;
+        padding: 35px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.055);
+    }
+
+    .receipt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        padding-bottom: 22px;
+        border-bottom: 2px solid #701e32;
+    }
+
+    .receipt-brand {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .receipt-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 11px;
+        background: #701e32;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .receipt-brand h2 {
+        margin: 0;
+        color: #701e32;
+        font-size: 21px;
+        letter-spacing: .5px;
+    }
+
+    .receipt-brand p {
+        margin: 5px 0 0;
+        color: #888;
+        font-size: 12px;
+    }
+
+    .receipt-title {
+        text-align: right;
+    }
+
+    .receipt-title h3 {
+        margin: 0 0 9px;
+        color: #701e32;
+        font-size: 18px;
+    }
+
+    .receipt-title p {
+        margin: 4px 0;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .receipt-status {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 11px;
+        border-radius: 20px;
+        background: #e8f5ec;
+        color: #25804a;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .receipt-information {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 25px 0;
+        padding: 17px;
+        background: #f8f5f6;
+        border: 1px solid #eee;
+        border-radius: 10px;
+    }
+
+    .receipt-info-item small {
+        display: block;
+        margin-bottom: 6px;
+        color: #888;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .5px;
+    }
+
+    .receipt-info-item strong {
+        color: #39333a;
+        font-size: 13px;
+    }
+
+    .receipt-section-title {
+        margin: 0 0 14px;
+        color: #39333a;
+        font-size: 14px;
+    }
+
+    .receipt-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 580px;
+    }
+
+    .receipt-table th {
+        padding: 12px 10px;
+        background: #701e32;
+        color: white;
+        text-align: left;
+        font-size: 10px;
+        letter-spacing: .4px;
+    }
+
+    .receipt-table td {
+        padding: 13px 10px;
+        border-bottom: 1px solid #eee;
+        color: #4b454c;
+        font-size: 12px;
+    }
+
+    .receipt-table tbody tr:nth-child(even) {
+        background: #faf8f9;
+    }
+
+    .receipt-table th:not(:first-child),
+    .receipt-table td:not(:first-child) {
+        text-align: center;
+    }
+
+    .receipt-product {
+        font-weight: 700;
+        color: #39333a;
+    }
+
+    .receipt-summary {
+        width: 310px;
+        max-width: 100%;
+        margin: 25px 0 0 auto;
+        display: grid;
+        gap: 13px;
+    }
+
+    .receipt-summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .receipt-summary-row strong {
+        color: #39333a;
+    }
+
+    .receipt-total {
+        padding: 15px;
+        background: #f8f5f6;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        color: #701e32;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .receipt-total strong {
+        color: #701e32;
+        font-size: 19px;
+    }
+
+    .receipt-observations {
+        margin-top: 25px;
+        padding: 15px;
+        background: #faf8f9;
+        border-radius: 9px;
+        color: #666;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .receipt-observations strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #39333a;
+    }
+
+    .receipt-footer {
+        margin-top: 30px;
+        padding-top: 18px;
+        border-top: 1px solid #eee;
+        text-align: center;
+    }
+
+    .receipt-footer strong {
+        color: #701e32;
+        font-size: 15px;
+    }
+
+    .receipt-footer p {
+        margin: 7px 0 0;
+        color: #999;
+        font-size: 11px;
+    }
+
+    @media (max-width: 650px) {
+        .receipt-paper {
+            padding: 20px 15px;
+        }
+
+        .receipt-header {
+            flex-direction: column;
+        }
+
+        .receipt-title {
+            text-align: left;
+        }
+
+        .receipt-information {
+            grid-template-columns: 1fr;
+        }
+
+        .receipt-toolbar {
+            align-items: stretch;
+        }
+
+        .receipt-actions {
+            width: 100%;
+        }
+
+        .receipt-button {
+            flex: 1;
+        }
+    }
+
+    @media print {
+        @page {
+            size: A5 portrait;
+            margin: 10mm;
+        }
+
+        body {
+            background: white !important;
+        }
+
+        .sidebar,
+        .topbar,
+        .page-footer,
+        .receipt-toolbar {
+            display: none !important;
+        }
+
+        .app-layout,
+        .main-content {
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        .receipt-page {
+            max-width: none;
+        }
+
+        .receipt-paper {
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        .receipt-table th {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .receipt-status,
+        .receipt-logo,
+        .receipt-total {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<section class="content-section receipt-page">
+
+    <!-- BARRA DE ACCIONES -->
+
+    <div class="receipt-toolbar">
+
+        <p>
+            Estás visualizando el comprobante de la venta
+            <strong>{{ venta.numero }}</strong>.
+        </p>
+
+        <div class="receipt-actions">
+
+            <a href="{% url 'ventas:detalle' venta.pk %}"
+               class="receipt-button receipt-back">
+                ← Volver a la venta
+            </a>
+
+            <a href="{% url 'ventas:comprobante' venta.pk %}?descargar=1"
+               class="receipt-button receipt-download">
+                ↓ Descargar comprobante
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- DOCUMENTO DEL COMPROBANTE -->
+
+    <div class="receipt-paper">
+
+        <!-- ENCABEZADO -->
+
+        <div class="receipt-header">
+
+            <div class="receipt-brand">
+
+                <div class="receipt-logo">H</div>
+
+                <div>
+                    <h2>LICORERÍA HOMERO</h2>
+                    <p>Sistema de gestión comercial</p>
+                </div>
+
+            </div>
+
+            <div class="receipt-title">
+
+                <h3>COMPROBANTE DE VENTA</h3>
+
+                <p>
+                    <strong>N.º:</strong>
+                    {{ venta.numero }}
+                </p>
+
+                <p>
+                    <strong>Fecha:</strong>
+                    {{ venta.fecha|date:"d/m/Y H:i" }}
+                </p>
+
+                <span class="receipt-status">
+                    ✓ VENTA CONFIRMADA
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- INFORMACIÓN GENERAL -->
+
+        <div class="receipt-information">
+
+            <div class="receipt-info-item">
+                <small>RESPONSABLE</small>
+                <strong>{{ venta.usuario.username }}</strong>
+            </div>
+
+            <div class="receipt-info-item">
+                <small>MÉTODO DE PAGO</small>
+                <strong>{{ venta.get_metodo_pago_display }}</strong>
+            </div>
+
+            <div class="receipt-info-item">
+                <small>ESTADO</small>
+                <strong>Confirmada</strong>
+            </div>
+
+        </div>
+
+
+        <!-- DETALLE DE PRODUCTOS -->
+
+        <h3 class="receipt-section-title">
+            Detalle de productos
+        </h3>
+
+        <div class="receipt-table-wrapper">
+
+            <table class="receipt-table">
+
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>Precio</th>
+                        <th>Desc.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for detalle in detalles %}
+
+                    <tr>
+
+                        <td class="receipt-product">
+                            {{ detalle.producto.nombre }}
+                        </td>
+
+                        <td>
+                            {{ detalle.cantidad }}
+                        </td>
+
+                        <td>
+                            Bs {{ detalle.precio_unitario|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            Bs {{ detalle.descuento|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                Bs {{ detalle.subtotal|floatformat:2 }}
+                            </strong>
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- RESUMEN ECONÓMICO -->
+
+        <div class="receipt-summary">
+
+            <div class="receipt-summary-row">
+                <span>Subtotal</span>
+                <strong>
+                    Bs {{ venta.subtotal|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="receipt-summary-row">
+                <span>Descuento general</span>
+                <strong>
+                    Bs {{ venta.descuento|floatformat:2 }}
+                </strong>
+            </div>
+
+            <div class="receipt-summary-row receipt-total">
+                <span>TOTAL PAGADO</span>
+                <strong>
+                    Bs {{ venta.total|floatformat:2 }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <!-- OBSERVACIONES -->
+
+        {% if venta.observaciones %}
+
+        <div class="receipt-observations">
+
+            <strong>Observaciones</strong>
+
+            {{ venta.observaciones|linebreaksbr }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- PIE DEL COMPROBANTE -->
+
+        <div class="receipt-footer">
+
+            <strong>¡Gracias por su compra!</strong>
+
+            <p>
+                LICORERÍA HOMERO · Comprobante generado por el sistema.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

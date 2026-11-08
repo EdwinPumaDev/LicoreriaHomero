@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 
 
 class IngresoCaja(models.Model):
+
     class MetodoPago(models.TextChoices):
         EFECTIVO = "EFECTIVO", "Efectivo"
         QR = "QR", "QR"
@@ -18,33 +19,56 @@ class IngresoCaja(models.Model):
         related_name="ingreso_caja",
         verbose_name="Venta relacionada",
     )
+
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="ingresos_caja",
         verbose_name="Usuario responsable",
     )
+
     metodo_pago = models.CharField(
         max_length=20,
         choices=MetodoPago.choices,
         default=MetodoPago.EFECTIVO,
         verbose_name="Método de pago",
     )
+
     monto = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         validators=[MinValueValidator(0)],
         verbose_name="Monto recibido",
     )
+
     referencia = models.CharField(
         max_length=100,
         blank=True,
         verbose_name="Referencia de pago",
     )
+
     observaciones = models.TextField(
         blank=True,
         verbose_name="Observaciones",
     )
+
+    anulado = models.BooleanField(
+        default=False,
+        verbose_name="Ingreso anulado",
+    )
+
+    anulado_en = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha de anulación",
+    )
+
+    motivo_anulacion = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Motivo de anulación",
+    )
+
     fecha = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Fecha de ingreso",
@@ -57,4 +81,8 @@ class IngresoCaja(models.Model):
         verbose_name_plural = "Ingresos de caja"
 
     def __str__(self):
-        return f"Ingreso de Bs {self.monto} - Venta {self.venta.numero}"
+        estado = "Anulado" if self.anulado else "Válido"
+        return (
+            f"Ingreso de Bs {self.monto} - "
+            f"Venta {self.venta.numero} ({estado})"
+        )

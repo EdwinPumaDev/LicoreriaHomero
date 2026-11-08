@@ -1,0 +1,633 @@
+```django
+{% extends "base.html" %}
+
+{% block title %}Caja e ingresos | Licorería Homero{% endblock %}
+{% block page_title %}Caja e ingresos{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / <strong>CAJA E INGRESOS</strong>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cash-list {
+        display: grid;
+        gap: 22px;
+    }
+
+    /* ENCABEZADO */
+
+    .cash-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .cash-heading p {
+        color: #85808a;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    /* INDICADORES */
+
+    .cash-indicators {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .cash-indicator-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.035);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .cash-indicator-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+
+    .cash-icon {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+        border-radius: 13px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .cash-icon-money {
+        background: #f7e9ed;
+        color: #701e32;
+    }
+
+    .cash-icon-count {
+        background: #e8f5ec;
+        color: #27834b;
+    }
+
+    .cash-icon-cancelled {
+        background: #fdeaea;
+        color: #b43b3b;
+    }
+
+    .cash-indicator-card p {
+        margin: 0 0 5px;
+        font-size: 13px;
+        color: #85808a;
+    }
+
+    .cash-indicator-card h3 {
+        margin: 0;
+        font-size: 25px;
+        color: #29242b;
+    }
+
+    .cash-indicator-card small {
+        display: block;
+        margin-top: 5px;
+        color: #99919a;
+        font-size: 11px;
+    }
+
+    /* TARJETAS */
+
+    .cash-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.035);
+    }
+
+    /* FILTROS */
+
+    .cash-filter-form {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+        align-items: end;
+        gap: 15px;
+    }
+
+    .cash-filter-group {
+        display: grid;
+        gap: 8px;
+    }
+
+    .cash-filter-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .cash-filter-group input,
+    .cash-filter-group select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #e5e1e3;
+        border-radius: 9px;
+        background: #fff;
+        font: inherit;
+        color: #333;
+    }
+
+    .cash-filter-group input:focus,
+    .cash-filter-group select:focus {
+        outline: none;
+        border-color: #701e32;
+        box-shadow: 0 0 0 3px rgba(112,30,50,.08);
+    }
+
+    .cash-filter-actions {
+        display: flex;
+        gap: 9px;
+    }
+
+    /* TABLA */
+
+    .cash-table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .cash-table-header h3 {
+        margin: 0;
+    }
+
+    .cash-count {
+        color: #85808a;
+        font-size: 13px;
+    }
+
+    .cash-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .cash-table {
+        width: 100%;
+        min-width: 950px;
+        border-collapse: collapse;
+    }
+
+    .cash-table th {
+        padding: 15px 13px;
+        text-align: left;
+        background: #f8f5f6;
+        color: #817985;
+        font-size: 11px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .cash-table td {
+        padding: 16px 13px;
+        border-bottom: 1px solid #f0edef;
+        font-size: 13px;
+        color: #48434b;
+    }
+
+    .cash-table tbody tr:hover {
+        background: #fdfafb;
+    }
+
+    .cash-sale-number {
+        color: #701e32;
+        font-weight: 700;
+    }
+
+    .cash-amount {
+        font-weight: 800;
+        color: #29242b;
+        white-space: nowrap;
+    }
+
+    .cash-date {
+        white-space: nowrap;
+    }
+
+    .cash-user {
+        font-weight: 600;
+    }
+
+    /* MÉTODOS Y ESTADOS */
+
+    .cash-method {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 30px;
+        background: #f4f0f2;
+        color: #701e32;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .cash-status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-valid {
+        background: #e8f5ec;
+        color: #25804a;
+    }
+
+    .status-cancelled {
+        background: #fdeaea;
+        color: #b43b3b;
+    }
+
+    .cash-cancel-reason {
+        display: block;
+        margin-top: 5px;
+        color: #a19aa2;
+        font-size: 11px;
+        max-width: 180px;
+        white-space: normal;
+    }
+
+    /* ACCIONES */
+
+    .cash-action {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #eadde1;
+        border-radius: 8px;
+        color: #701e32;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .2s;
+    }
+
+    .cash-action:hover {
+        background: #f8edf0;
+    }
+
+    /* SIN RESULTADOS */
+
+    .cash-empty {
+        padding: 45px 20px !important;
+        text-align: center;
+        color: #8b858d !important;
+    }
+
+    .cash-empty-icon {
+        font-size: 30px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 1050px) {
+        .cash-indicators {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .cash-filter-form {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 650px) {
+        .cash-indicators {
+            grid-template-columns: 1fr;
+        }
+
+        .cash-filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .cash-filter-actions {
+            flex-wrap: wrap;
+        }
+
+        .cash-card {
+            padding: 16px;
+        }
+    }
+
+    /* TEMA OSCURO */
+
+    html[data-theme="oscuro"] .cash-indicator-card,
+    html[data-theme="oscuro"] .cash-card {
+        background: #24242a;
+        border-color: #39393f;
+    }
+
+    html[data-theme="oscuro"] .cash-indicator-card h3,
+    html[data-theme="oscuro"] .cash-table td,
+    html[data-theme="oscuro"] .cash-table-header h3 {
+        color: #eeeeef;
+    }
+
+    html[data-theme="oscuro"] .cash-table th {
+        background: #303037;
+        color: #c4bec8;
+    }
+
+    html[data-theme="oscuro"] .cash-table tbody tr:hover {
+        background: #303037;
+    }
+
+    html[data-theme="oscuro"] .cash-filter-group label {
+        color: #ded9e1;
+    }
+
+    html[data-theme="oscuro"] .cash-filter-group input,
+    html[data-theme="oscuro"] .cash-filter-group select {
+        background: #303037;
+        color: #eeeeef;
+        border-color: #494951;
+    }
+
+    html[data-theme="oscuro"] .cash-indicator-card p,
+    html[data-theme="oscuro"] .cash-indicator-card small,
+    html[data-theme="oscuro"] .cash-count {
+        color: #aaa3ae;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="content-section cash-list">
+
+    <!-- DESCRIPCIÓN -->
+
+    <div class="cash-heading">
+        <p>Consulta y controla los ingresos generados por las ventas confirmadas.</p>
+    </div>
+
+    <!-- INDICADORES -->
+
+    <div class="cash-indicators">
+
+        <div class="cash-indicator-card">
+
+            <div class="cash-icon cash-icon-money">
+                Bs
+            </div>
+
+            <div>
+                <p>Total de ingresos válidos</p>
+                <h3>Bs {{ total_ingresos|floatformat:2 }}</h3>
+                <small>Sin incluir ingresos anulados</small>
+            </div>
+
+        </div>
+
+        <div class="cash-indicator-card">
+
+            <div class="cash-icon cash-icon-count">
+                ✓
+            </div>
+
+            <div>
+                <p>Ingresos válidos</p>
+                <h3>{{ cantidad_ingresos }}</h3>
+                <small>Operaciones vigentes</small>
+            </div>
+
+        </div>
+
+        <div class="cash-indicator-card">
+
+            <div class="cash-icon cash-icon-cancelled">
+                ✕
+            </div>
+
+            <div>
+                <p>Ingresos anulados</p>
+                <h3>{{ cantidad_anulados }}</h3>
+                <small>Conservados en el historial</small>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FILTROS -->
+
+    <div class="cash-card">
+
+        <form method="get" class="cash-filter-form">
+
+            <div class="cash-filter-group">
+
+                <label for="fecha_inicio">Desde</label>
+
+                <input
+                    type="date"
+                    id="fecha_inicio"
+                    name="fecha_inicio"
+                    value="{{ fecha_inicio }}"
+                >
+
+            </div>
+
+            <div class="cash-filter-group">
+
+                <label for="fecha_fin">Hasta</label>
+
+                <input
+                    type="date"
+                    id="fecha_fin"
+                    name="fecha_fin"
+                    value="{{ fecha_fin }}"
+                >
+
+            </div>
+
+            <div class="cash-filter-group">
+
+                <label for="metodo_pago">Método de pago</label>
+
+                <select name="metodo_pago" id="metodo_pago">
+
+                    <option value="">Todos los métodos</option>
+
+                    {% for valor, etiqueta in metodos_pago %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if metodo_pago == valor %}selected{% endif %}
+                        >
+                            {{ etiqueta }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="cash-filter-actions">
+
+                <button type="submit" class="btn btn-primary">
+                    Filtrar
+                </button>
+
+                <a
+                    href="{% url 'caja:lista_ingresos' %}"
+                    class="btn btn-secondary"
+                >
+                    Limpiar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- HISTORIAL -->
+
+    <div class="cash-card">
+
+        <div class="cash-table-header">
+
+            <h3>Historial de movimientos</h3>
+
+            <span class="cash-count">
+                {{ cantidad_registros }} registro(s)
+            </span>
+
+        </div>
+
+        <div class="cash-table-wrapper">
+
+            <table class="cash-table">
+
+                <thead>
+                    <tr>
+                        <th>Fecha y hora</th>
+                        <th>N.º de venta</th>
+                        <th>Método de pago</th>
+                        <th>Monto recibido</th>
+                        <th>Estado</th>
+                        <th>Responsable</th>
+                        <th>Referencia</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for ingreso in ingresos %}
+
+                    <tr>
+
+                        <td class="cash-date">
+                            {{ ingreso.fecha|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            <span class="cash-sale-number">
+                                {{ ingreso.venta.numero }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="cash-method">
+                                {{ ingreso.get_metodo_pago_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="cash-amount">
+                                Bs {{ ingreso.monto|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            {% if ingreso.anulado %}
+
+                                <span class="cash-status status-cancelled">
+                                    Anulado
+                                </span>
+
+                                {% if ingreso.motivo_anulacion %}
+                                    <small class="cash-cancel-reason">
+                                        Motivo: {{ ingreso.motivo_anulacion }}
+                                    </small>
+                                {% endif %}
+
+                            {% else %}
+
+                                <span class="cash-status status-valid">
+                                    Válido
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            <span class="cash-user">
+                                {{ ingreso.usuario.username }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ ingreso.referencia|default:"—" }}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'ventas:detalle' ingreso.venta.pk %}"
+                                class="cash-action"
+                            >
+                                Ver venta →
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="8" class="cash-empty">
+                            <span class="cash-empty-icon">▤</span>
+                            No hay ingresos registrados para los filtros seleccionados.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+```

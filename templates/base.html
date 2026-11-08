@@ -1,111 +1,291 @@
-
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es"
+      data-theme="{% if configuracion_sistema and configuracion_sistema.tema == 'OSCURO' %}oscuro{% else %}claro{% endif %}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Dashboard | Licorería Homero{% endblock %}</title>
+    <title>
+        {% block title %}{{ configuracion_sistema.nombre_sistema|default:"Licorería Homero" }}{% endblock %}
+    </title>
+
+    {% if configuracion_sistema and configuracion_sistema.favicon %}
+        <link rel="icon" href="{{ configuracion_sistema.favicon.url }}">
+    {% endif %}
 
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tema.css' %}">
+
+    <style>
+        :root {
+            --color-principal: {{ configuracion_sistema.color_principal|default:"#701E32" }};
+            --color-secundario: {{ configuracion_sistema.color_secundario|default:"#D4AF37" }};
+            --color-fondo-personalizado: {{ configuracion_sistema.color_fondo|default:"#F5F5F5" }};
+            --color-texto-personalizado: {{ configuracion_sistema.color_texto|default:"#333333" }};
+            --tipografia-personalizada: "{{ configuracion_sistema.tipografia|default:'Inter' }}", Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--tipografia-personalizada);
+            color: var(--color-texto-personalizado);
+        }
+
+        .brand-mark {
+            background: var(--color-principal) !important;
+            color: white;
+            overflow: hidden;
+        }
+
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand strong,
+        .brand small {
+            color: var(--color-texto-personalizado);
+        }
+
+        .nav-item.active {
+            border-color: var(--color-principal);
+            color: var(--color-principal);
+        }
+
+        .nav-item.active span {
+            color: var(--color-principal);
+        }
+
+        .btn-guardar-personalizacion,
+        button[type="submit"]:not(.logout-button) {
+            background-color: var(--color-principal);
+        }
+
+        /* CORRECCIÓN DEL MENÚ LATERAL */
+
+        .sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            bottom: 0 !important;
+
+            width: 250px;
+            height: 100vh !important;
+            height: 100dvh !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+
+            scrollbar-width: thin;
+            scrollbar-color: #A59AA0 transparent;
+        }
+
+        .sidebar > .brand,
+        .sidebar > .menu-label,
+        .sidebar > .navigation,
+        .sidebar > .sidebar-bottom {
+            flex-shrink: 0 !important;
+        }
+
+        .sidebar > .navigation {
+            min-height: auto !important;
+            overflow: visible !important;
+        }
+
+        .sidebar > .sidebar-bottom {
+            margin-top: 15px !important;
+            padding-bottom: 20px !important;
+        }
+
+        .sidebar > .sidebar-bottom form {
+            width: 100%;
+            margin: 0;
+        }
+
+        .sidebar > .sidebar-bottom .logout-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                bottom: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 16px !important;
+            }
+
+            .sidebar > .navigation {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+
 <div class="app-layout">
 
+    <!-- MENÚ LATERAL -->
     <aside class="sidebar">
 
         <a href="{% url 'dashboard' %}" class="brand">
-            <span class="brand-mark">H</span>
-            <span>
-                <strong>LICORERÍA</strong>
-                <small>HOMERO</small>
+
+            <span class="brand-mark">
+                {% if configuracion_sistema and configuracion_sistema.logo %}
+                    <img src="{{ configuracion_sistema.logo.url }}"
+                         alt="Logo del negocio">
+                {% else %}
+                    H
+                {% endif %}
             </span>
+
+            <span>
+                <strong>
+                    {{ configuracion_sistema.nombre_comercial|default:"LICORERÍA" }}
+                </strong>
+
+                {% if not configuracion_sistema %}
+                    <small>HOMERO</small>
+                {% endif %}
+            </span>
+
         </a>
 
         <p class="menu-label">MENÚ PRINCIPAL</p>
 
         <nav class="navigation">
 
-            <a class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            <!-- DASHBOARD -->
+            <a class="nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name != 'reportes' %}active{% endif %}"
                href="{% url 'dashboard' %}">
-                <span>▦</span> Dashboard
+                <span>▦</span>
+                Dashboard
             </a>
 
+            <!-- PRODUCTOS -->
             <a class="nav-item {% if request.resolver_match.app_name == 'productos' %}active{% endif %}"
                href="{% url 'productos:lista' %}">
-                <span>▣</span> Productos
+                <span>▣</span>
+                Productos
             </a>
 
-            <!-- INVENTARIO CONECTADO -->
+            <!-- INVENTARIO -->
             <a class="nav-item {% if request.resolver_match.app_name == 'inventario' %}active{% endif %}"
                href="{% url 'inventario:lista' %}">
-                <span>▤</span> Inventario
+                <span>▤</span>
+                Inventario
             </a>
 
-            <a class="nav-item {% if request.resolver_match.app_name == 'compras' %}active{% endif %}"
-               href="{% url 'compras:lista' %}">
-                <span>⇩</span> Compras
+            <!-- COMPRAS -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' or request.user.perfil.cargo == 'ENCARGADO' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'compras' %}active{% endif %}"
+                   href="{% url 'compras:lista' %}">
+                    <span>⇩</span>
+                    Compras
+                </a>
+            {% endif %}
+
+            <!-- PROVEEDORES -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' or request.user.perfil.cargo == 'ENCARGADO' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'proveedores' %}active{% endif %}"
+                   href="{% url 'proveedores:lista' %}">
+                    <span>♧</span>
+                    Proveedores
+                </a>
+            {% endif %}
+
+            <!-- VENTAS -->
+            <a class="nav-item {% if request.resolver_match.app_name == 'ventas' %}active{% endif %}"
+               href="{% url 'ventas:lista' %}">
+                <span>↗</span>
+                Ventas
             </a>
 
-            <a class="nav-item"
-               href="#proveedores"
-               title="Módulo en construcción">
-                <span>♧</span> Proveedores
-                <small class="module-pending">Próximamente</small>
+            <!-- CAJA -->
+            <a class="nav-item {% if request.resolver_match.app_name == 'caja' %}active{% endif %}"
+               href="{% url 'caja:lista_ingresos' %}">
+                <span>◉</span>
+                Caja e ingresos
             </a>
 
-            <a class="nav-item"
-               href="#ventas"
-               title="Módulo en construcción">
-                <span>↗</span> Ventas
-                <small class="module-pending">Próximamente</small>
-            </a>
+            <!-- REPORTES -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' or request.user.perfil.cargo == 'ENCARGADO' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'reportes' %}active{% endif %}"
+                   href="{% url 'reportes:dashboard' %}">
+                    <span>▥</span>
+                    Reportes
+                </a>
+            {% endif %}
 
-            <a class="nav-item"
-               href="#caja"
-               title="Módulo en construcción">
-                <span>◉</span> Caja e ingresos
-                <small class="module-pending">Próximamente</small>
-            </a>
+            <!-- AUDITORÍA -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'auditoria' %}active{% endif %}"
+                   href="{% url 'auditoria:lista' %}">
+                    <span>◷</span>
+                    Auditoría
+                </a>
+            {% endif %}
 
-            <a class="nav-item"
-               href="#reportes"
-               title="Módulo en construcción">
-                <span>▥</span> Reportes
-                <small class="module-pending">Próximamente</small>
-            </a>
+            <!-- USUARIOS -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'usuarios' %}active{% endif %}"
+                   href="{% url 'usuarios:lista' %}">
+                    <span>♙</span>
+                    Usuarios
+                </a>
+            {% endif %}
 
-            <a class="nav-item"
-               href="#usuarios"
-               title="Módulo en construcción">
-                <span>♙</span> Usuarios
-                <small class="module-pending">Próximamente</small>
-            </a>
+            <!-- PERSONALIZACIÓN -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' %}
+                <a class="nav-item {% if request.resolver_match.app_name == 'configuracion' %}active{% endif %}"
+                   href="{% url 'configuracion:personalizacion' %}">
+                    <span>⚙</span>
+                    Personalización
+                </a>
+            {% endif %}
 
-            {% if request.user.is_staff %}
-            <a class="nav-item"
-               href="{% url 'admin:index' %}"
-               target="_blank">
-                <span>⚙</span> Administración
-            </a>
+            <!-- ADMINISTRACIÓN DJANGO -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' %}
+                <a class="nav-item"
+                   href="{% url 'admin:index' %}"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <span>▤</span>
+                    Administración
+                </a>
             {% endif %}
 
         </nav>
 
+        <!-- PARTE INFERIOR DEL MENÚ -->
         <div class="sidebar-bottom">
 
-            <div class="system-status">
-                <span class="status-dot"></span>
-                Sistema en desarrollo
-            </div>
-
+            <!-- CERRAR SESIÓN -->
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
+
                 <button class="logout-button" type="submit">
-                    ↪ Cerrar sesión
+                    <span>↪</span>
+                    Cerrar sesión
                 </button>
             </form>
 
@@ -113,14 +293,16 @@
 
     </aside>
 
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
 
+        <!-- CABECERA -->
         <header class="topbar">
 
             <div>
                 <p class="breadcrumb">
                     {% block breadcrumb %}
-                        LICORERÍA HOMERO / <strong>INICIO</strong>
+                        {{ configuracion_sistema.nombre_comercial|default:"LICORERÍA HOMERO" }} / <strong>INICIO</strong>
                     {% endblock %}
                 </p>
 
@@ -131,6 +313,7 @@
                 </h1>
             </div>
 
+            <!-- USUARIO ACTUAL -->
             <div class="user-chip">
 
                 <div class="avatar">
@@ -138,62 +321,68 @@
                 </div>
 
                 <div class="user-info">
-
                     <strong>
                         {{ request.user.get_full_name|default:request.user.username }}
                     </strong>
 
                     <small>
-                        {% if request.user.perfil %}
+                        {% if request.user.is_superuser %}
+                            Administrador principal
+                        {% elif request.user.perfil %}
                             {{ request.user.perfil.get_cargo_display }}
-                        {% elif request.user.is_superuser %}
-                            Administrador
                         {% else %}
                             Usuario del sistema
                         {% endif %}
                     </small>
-
                 </div>
 
             </div>
 
         </header>
 
+        <!-- MENSAJES DEL SISTEMA -->
         {% if messages %}
-        <div class="messages-container">
+            <div class="messages-container">
 
-            {% for message in messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }}">
 
-            <div class="alert alert-{{ message.tags|default:'info' }}">
+                        <span class="alert-icon">
+                            {% if message.tags == 'success' %}
+                                ✓
+                            {% elif message.tags == 'error' %}
+                                ✕
+                            {% elif message.tags == 'warning' %}
+                                ⚠
+                            {% else %}
+                                ℹ
+                            {% endif %}
+                        </span>
 
-                <span class="alert-icon">
-                    {% if message.tags == 'success' %}
-                        ✓
-                    {% elif message.tags == 'error' %}
-                        ✕
-                    {% elif message.tags == 'warning' %}
-                        ⚠
-                    {% else %}
-                        ℹ
-                    {% endif %}
-                </span>
+                        <span class="alert-text">
+                            {{ message }}
+                        </span>
 
-                <span class="alert-text">
-                    {{ message }}
-                </span>
+                    </div>
+                {% endfor %}
 
             </div>
-
-            {% endfor %}
-
-        </div>
         {% endif %}
 
+        <!-- CONTENIDO DE CADA MÓDULO -->
         {% block content %}{% endblock %}
 
+        <!-- PIE DE PÁGINA -->
         <footer class="page-footer">
-            <span>Licorería Homero · Sistema de gestión</span>
-            <span>Versión inicial de desarrollo</span>
+
+            <span>
+                {{ configuracion_sistema.nombre_comercial|default:"Licorería Homero" }} · Sistema de gestión
+            </span>
+
+            <span>
+                Versión inicial de desarrollo
+            </span>
+
         </footer>
 
     </main>

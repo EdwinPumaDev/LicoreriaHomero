@@ -1,20 +1,22 @@
-
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 from apps.usuarios.views import dashboard
+from apps.auditoria.views import LoginAuditoriaView, LogoutAuditoriaView
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # Autenticación
+    # PÁGINA PÚBLICA
+    path("", include("apps.publico.urls")),
+
+    # ACCESO ADMINISTRATIVO
     path(
-        "",
-        auth_views.LoginView.as_view(
+        "acceso/",
+        LoginAuditoriaView.as_view(
             template_name="usuarios/login.html",
             redirect_authenticated_user=True,
         ),
@@ -23,22 +25,25 @@ urlpatterns = [
 
     path("dashboard/", dashboard, name="dashboard"),
 
-    # Productos
+    # MÓDULOS ADMINISTRATIVOS
+    path("usuarios/", include("apps.usuarios.urls")),
     path("productos/", include("apps.productos.urls")),
-
-    # Proveedores
     path("proveedores/", include("apps.proveedores.urls")),
-
-    # Compras
     path("compras/", include("apps.compras.urls")),
-
-    # Inventario
     path("inventario/", include("apps.inventario.urls")),
+    path("ventas/", include("apps.ventas.urls")),
+    path("caja/", include("apps.caja.urls")),
+    path("reportes/", include("apps.reportes.urls")),
+    path("auditoria/", include("apps.auditoria.urls")),
 
-    # Cerrar sesión
+    path(
+        "personalizacion/",
+        include("apps.configuracion.urls"),
+    ),
+
     path(
         "cerrar-sesion/",
-        auth_views.LogoutView.as_view(),
+        LogoutAuditoriaView.as_view(),
         name="logout",
     ),
 ]

@@ -1,12 +1,21 @@
+
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from apps.inventario.models import MovimientoInventario
+from apps.inventario.forms import AjusteInventarioForm
+from apps.inventario.services import registrar_ajuste
+from apps.usuarios.permisos import (
+    todos_los_cargos,
+    administrador_o_encargado,
+)
 
 
 @login_required
+@todos_los_cargos
 def lista_movimientos(request):
     q = request.GET.get("q", "").strip()
     tipo = request.GET.get("tipo", "").strip()
@@ -18,7 +27,6 @@ def lista_movimientos(request):
         "venta",
     ).all()
 
-    # Buscador
     if q:
         movimientos = movimientos.filter(
             Q(producto__nombre__icontains=q)
@@ -28,13 +36,11 @@ def lista_movimientos(request):
             | Q(venta__id__icontains=q)
         )
 
-    # Filtro por tipo de movimiento
     if tipo:
         movimientos = movimientos.filter(tipo=tipo)
 
     movimientos = movimientos.order_by("-fecha", "-id")
 
-    # Indicadores generales
     total_movimientos = MovimientoInventario.objects.count()
 
     total_entradas = MovimientoInventario.objects.filter(
@@ -53,10 +59,8 @@ def lista_movimientos(request):
         ]
     ).count()
 
-    # Paginación
     paginator = Paginator(movimientos, 15)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
     return render(
         request,
@@ -71,4 +75,36 @@ def lista_movimientos(request):
             "total_entradas": total_entradas,
             "total_salidas": total_salidas,
         },
+    )
+
+
+@login_required
+@administrador_o_encargado
+def crear_ajuste(request):
+    if request.method == "POST":
+        form = AjusteInventarioForm(request.POST)
+
+        if form.is_valid():
+            try:
+                registrar_ajuste(
+                    producto_id=form.cleaned_data["producto"].pk,
+                    usuario=request.user,
+                    cantidad=form.cleaned_data["cantidad"],
+                    tipo=form.cleaned_data["tipo"],
+                    motivo=form.cleaned_data["motivo"],
+                )
+
+                return redirect("inventario:lista")
+
+            except ValidationError as error:
+                for mensaje in error.messages:
+                    form.add_error(None, mensaje)
+
+    else:
+        form = AjusteInventarioForm()
+
+    return render(
+        request,
+        "inventario/ajuste.html",
+        {"form": form},
     )

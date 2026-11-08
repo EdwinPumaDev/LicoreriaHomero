@@ -1,0 +1,284 @@
+
+{% extends "base.html" %}
+
+{% block title %}Personalización | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO / <strong>PERSONALIZACIÓN</strong>
+{% endblock %}
+
+{% block page_title %}Personalización del sistema{% endblock %}
+
+{% block content %}
+
+<style>
+    .personalizacion-container {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 22px;
+    }
+
+    .personalizacion-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e5e5e5);
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    .personalizacion-card h2 {
+        font-size: 17px;
+        margin: 0 0 6px;
+    }
+
+    .personalizacion-card > p {
+        color: #888;
+        font-size: 13px;
+        margin: 0 0 22px;
+    }
+
+    .personalizacion-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .campo-personalizacion {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .campo-personalizacion label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .campo-personalizacion input:not([type="color"]),
+    .campo-personalizacion select {
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        background: #fff;
+        color: #333;
+        box-sizing: border-box;
+    }
+
+    .campo-personalizacion input[type="color"] {
+        width: 100%;
+        height: 44px;
+        padding: 4px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        cursor: pointer;
+    }
+
+    .campo-personalizacion input[type="file"] {
+        font-size: 12px;
+    }
+
+    .campo-completo {
+        grid-column: 1 / -1;
+    }
+
+    .archivo-actual {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .acciones-personalizacion {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    .btn-guardar-personalizacion {
+        background: var(--color-principal, #701E32);
+        color: white;
+        border: none;
+        border-radius: 7px;
+        padding: 12px 22px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-guardar-personalizacion:hover {
+        opacity: .9;
+    }
+
+    .error-personalizacion {
+        color: #c62828;
+        font-size: 12px;
+    }
+
+    .mensaje-personalizacion {
+        padding: 12px 15px;
+        border-radius: 7px;
+        margin-bottom: 18px;
+        background: #e8f5e9;
+        color: #256029;
+    }
+
+    /* ==========================================
+       CORRECCIONES PARA EL TEMA OSCURO
+    =========================================== */
+
+    html[data-theme="oscuro"] .personalizacion-card {
+        background: #222226;
+        border-color: #39393F;
+        color: #F1F1F1;
+    }
+
+    html[data-theme="oscuro"] .personalizacion-card h2,
+    html[data-theme="oscuro"] .personalizacion-card label {
+        color: #F1F1F1;
+    }
+
+    html[data-theme="oscuro"] .personalizacion-card > p {
+        color: #B0ADB5;
+    }
+
+    html[data-theme="oscuro"] .campo-personalizacion input:not([type="color"]),
+    html[data-theme="oscuro"] .campo-personalizacion select {
+        background: #303036 !important;
+        color: #F5F5F5 !important;
+        border-color: #505057 !important;
+    }
+
+    html[data-theme="oscuro"] .campo-personalizacion input[type="file"] {
+        color: #E5E5E5 !important;
+    }
+
+    html[data-theme="oscuro"] .campo-personalizacion input[type="color"] {
+        background: #303036;
+        border-color: #505057;
+    }
+
+    html[data-theme="oscuro"] .archivo-actual {
+        color: #B9B4BE;
+    }
+
+    html[data-theme="oscuro"] .mensaje-personalizacion {
+        background: #203A2D;
+        color: #B9E8C9;
+        border: 1px solid #35634A;
+    }
+
+    @media (max-width: 700px) {
+        .personalizacion-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .campo-completo {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="personalizacion-container">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mensaje-personalizacion">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="personalizacion-card">
+            <h2>Identidad del negocio</h2>
+            <p>Configura la información que identifica a tu licorería.</p>
+
+            <div class="personalizacion-grid">
+
+                {% for field in formulario %}
+                    {% if field.name == "nombre_comercial" or field.name == "nombre_sistema" or field.name == "propietario" or field.name == "nit" or field.name == "direccion" or field.name == "telefono" or field.name == "logo" or field.name == "favicon" %}
+
+                        <div class="campo-personalizacion {% if field.name == 'direccion' %}campo-completo{% endif %}">
+
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.name == "logo" and configuracion.logo %}
+                                <span class="archivo-actual">
+                                    Logo actual: {{ configuracion.logo.name }}
+                                </span>
+                            {% endif %}
+
+                            {% if field.name == "favicon" and configuracion.favicon %}
+                                <span class="archivo-actual">
+                                    Favicon actual: {{ configuracion.favicon.name }}
+                                </span>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <span class="error-personalizacion">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <div class="personalizacion-card" style="margin-top:22px;">
+
+            <h2>Apariencia del sistema</h2>
+            <p>Personaliza los colores, la tipografía y el tema visual.</p>
+
+            <div class="personalizacion-grid">
+
+                {% for field in formulario %}
+                    {% if field.name == "color_principal" or field.name == "color_secundario" or field.name == "color_fondo" or field.name == "color_texto" or field.name == "tipografia" or field.name == "tema" %}
+
+                        <div class="campo-personalizacion">
+
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% for error in field.errors %}
+                                <span class="error-personalizacion">
+                                    {{ error }}
+                                </span>
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+
+        {% if formulario.non_field_errors %}
+            <div class="error-personalizacion">
+                {{ formulario.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="acciones-personalizacion">
+            <button type="submit" class="btn-guardar-personalizacion">
+                Guardar personalización
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

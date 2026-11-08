@@ -1,0 +1,608 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Catálogo | Licorería Homero</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #faf8f7;
+            color: #30272a;
+        }
+
+        /* NAVEGACIÓN */
+
+        .navbar {
+            background: #701e32;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #d4af37;
+        }
+
+        .navbar nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .navbar a:hover {
+            color: #d4af37;
+        }
+
+        /* PORTADA */
+
+        .catalog-hero {
+            background: linear-gradient(110deg, #351421, #701e32);
+            color: white;
+            padding: 55px 7%;
+            text-align: center;
+        }
+
+        .catalog-hero span {
+            color: #d4af37;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .catalog-hero h1 {
+            font-size: 36px;
+            margin: 13px 0;
+        }
+
+        .catalog-hero p {
+            color: #e7dce0;
+            font-size: 15px;
+        }
+
+        /* CONTENIDO */
+
+        .catalog-container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 45px 7%;
+        }
+
+        .catalog-heading {
+            margin-bottom: 25px;
+        }
+
+        .catalog-heading h2 {
+            color: #701e32;
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .catalog-heading p {
+            color: #81777b;
+            font-size: 14px;
+        }
+
+        /* FILTROS */
+
+        .filters {
+            background: white;
+            border: 1px solid #eee6e8;
+            border-radius: 12px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 240px auto auto;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .filters input,
+        .filters select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #e5dce0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #30272a;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: #701e32;
+        }
+
+        .filter-button,
+        .clear-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+
+        .filter-button {
+            background: #701e32;
+            color: white;
+        }
+
+        .filter-button:hover {
+            background: #8b2942;
+        }
+
+        .clear-button {
+            background: #f1ecee;
+            color: #701e32;
+        }
+
+        .clear-button:hover {
+            background: #e9dfe3;
+        }
+
+        /* MENSAJES */
+
+        .messages {
+            margin-bottom: 22px;
+        }
+
+        .message {
+            padding: 13px 16px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #e8f5ec;
+            color: #27834b;
+            font-size: 14px;
+        }
+
+        /* PRODUCTOS */
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #eee6e8;
+            border-radius: 13px;
+            overflow: hidden;
+            transition: .2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        }
+
+        .product-image {
+            height: 235px;
+            background: #f5f1f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 12px;
+        }
+
+        .product-placeholder {
+            font-size: 65px;
+            color: #c8b9bf;
+        }
+
+        .product-info {
+            padding: 18px;
+        }
+
+        .product-category {
+            color: #a47a2b;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        .product-info h3 {
+            color: #30272a;
+            font-size: 16px;
+            margin: 9px 0;
+            min-height: 38px;
+        }
+
+        .product-brand {
+            color: #81777b;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .product-price {
+            color: #701e32;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .product-stock {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #e8f5ec;
+            color: #27834b;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* BOTÓN AGREGAR AL CARRITO */
+
+        .cart-form {
+            margin-top: 17px;
+        }
+
+        .add-cart-button {
+            width: 100%;
+            padding: 12px 15px;
+            background: #701e32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .add-cart-button:hover {
+            background: #8b2942;
+        }
+
+        /* SIN RESULTADOS */
+
+        .empty-results {
+            grid-column: 1 / -1;
+            background: white;
+            border: 1px dashed #d9cbd0;
+            border-radius: 12px;
+            padding: 55px 20px;
+            text-align: center;
+            color: #81777b;
+        }
+
+        .empty-results h3 {
+            color: #701e32;
+            margin-bottom: 10px;
+        }
+
+        /* PIE DE PÁGINA */
+
+        .footer {
+            background: #27151c;
+            color: #e9dfe3;
+            padding: 35px 7%;
+            text-align: center;
+        }
+
+        .footer h3 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .footer p {
+            color: #c5b9bf;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .footer-bottom {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #49343d;
+            font-size: 12px;
+            color: #a99ba2;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1050px) {
+            .products-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .navbar {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .navbar nav {
+                justify-content: center;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .catalog-hero h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid,
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .catalog-container {
+                padding: 30px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVEGACIÓN -->
+
+    <header class="navbar">
+
+        <div class="brand">
+            Licorería <span>Homero</span>
+        </div>
+
+        <nav>
+            <a href="{% url 'publico:inicio' %}">Inicio</a>
+            <a href="{% url 'publico:catalogo' %}">Productos</a>
+            <a href="{% url 'publico:inicio' %}#nosotros">Nosotros</a>
+            <a href="{% url 'publico:inicio' %}#contacto">Contacto</a>
+            <a href="{% url 'publico:carrito' %}">🛒 Mi carrito</a>
+        </nav>
+
+    </header>
+
+
+    <!-- PORTADA DEL CATÁLOGO -->
+
+    <section class="catalog-hero">
+
+        <span>LICORERÍA HOMERO</span>
+
+        <h1>Nuestro catálogo</h1>
+
+        <p>
+            Descubre nuestra variedad de productos y encuentra tus favoritos.
+        </p>
+
+    </section>
+
+
+    <!-- CONTENIDO -->
+
+    <main class="catalog-container">
+
+        <div class="catalog-heading">
+
+            <h2>Todos nuestros productos</h2>
+
+            <p>
+                Explora los productos disponibles en nuestra licorería.
+            </p>
+
+        </div>
+
+
+        <!-- MENSAJES -->
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+        <!-- FILTROS -->
+
+        <form method="get" class="filters">
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Buscar producto por nombre..."
+                value="{{ busqueda }}"
+            >
+
+            <select name="categoria">
+
+                <option value="">Todas las categorías</option>
+
+                {% for categoria in categorias %}
+
+                    <option
+                        value="{{ categoria.id }}"
+                        {% if categoria_seleccionada == categoria.id|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ categoria.nombre }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <button type="submit" class="filter-button">
+                Buscar
+            </button>
+
+            <a
+                href="{% url 'publico:catalogo' %}"
+                class="clear-button"
+            >
+                Limpiar
+            </a>
+
+        </form>
+
+
+        <!-- LISTADO DE PRODUCTOS -->
+
+        <div class="products-grid">
+
+            {% for producto in productos %}
+
+                <article class="product-card">
+
+                    <div class="product-image">
+
+                        {% if producto.imagen %}
+
+                            <img
+                                src="{{ producto.imagen.url }}"
+                                alt="{{ producto.nombre }}"
+                            >
+
+                        {% else %}
+
+                            <div class="product-placeholder">
+                                🍾
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="product-info">
+
+                        <span class="product-category">
+                            {{ producto.categoria.nombre }}
+                        </span>
+
+                        <h3>
+                            {{ producto.nombre }}
+                        </h3>
+
+                        <p class="product-brand">
+
+                            {% if producto.marca %}
+                                {{ producto.marca.nombre }}
+                            {% else %}
+                                Sin marca
+                            {% endif %}
+
+                        </p>
+
+                        <div class="product-price">
+                            Bs {{ producto.precio_venta|floatformat:2 }}
+                        </div>
+
+                        <span class="product-stock">
+                            Disponible
+                        </span>
+
+                        <!-- AGREGAR AL CARRITO -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'publico:agregar_carrito' producto.id %}"
+                            class="cart-form"
+                        >
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="add-cart-button">
+                                🛒 Agregar al carrito
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <div class="empty-results">
+
+                    <h3>No encontramos productos</h3>
+
+                    <p>
+                        Intenta cambiar el nombre de búsqueda o seleccionar
+                        otra categoría.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+
+    <!-- PIE DE PÁGINA -->
+
+    <footer class="footer">
+
+        <h3>Licorería Homero</h3>
+
+        <p>
+            Calidad, variedad y buena atención.
+        </p>
+
+        <p>
+            Vallegrande - Santa Cruz, Bolivia
+        </p>
+
+        <div class="footer-bottom">
+            © 2026 Licorería Homero. Todos los derechos reservados.
+        </div>
+
+    </footer>
+
+</body>
+</html>

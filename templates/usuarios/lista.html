@@ -1,0 +1,256 @@
+
+{% extends "base.html" %}
+
+{% block title %}Usuarios | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+LICORERÍA HOMERO / <strong>USUARIOS</strong>
+{% endblock %}
+
+{% block page_title %}Gestión de usuarios{% endblock %}
+
+{% block extra_css %}
+<style>
+.users-container {
+    background: #fff;
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.05);
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.users-header p {
+    color: #777;
+    margin: 5px 0 0;
+}
+
+.btn-primary {
+    background: #701E32;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.users-table th {
+    background: #f8f5f6;
+    color: #701E32;
+    font-size: 13px;
+}
+
+.users-table td {
+    font-size: 13px;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.active {
+    background: #e5f6eb;
+    color: #188344;
+}
+
+.inactive {
+    background: #fde8e8;
+    color: #b42318;
+}
+
+.actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: inline-block;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-edit {
+    background: #edf2ff;
+    color: #3156a3;
+}
+
+.btn-password {
+    background: #f3edff;
+    color: #7042a3;
+}
+
+.btn-disable {
+    background: #fff0e5;
+    color: #a34c00;
+}
+
+.btn-enable {
+    background: #e5f6eb;
+    color: #188344;
+}
+
+.btn-delete {
+    background: #fde8e8;
+    color: #b42318;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 35px;
+    color: #888;
+}
+
+@media(max-width: 950px) {
+    .users-container {
+        overflow-x: auto;
+    }
+
+    .users-table {
+        min-width: 1050px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="users-container">
+
+    <div class="users-header">
+        <div>
+            <h2>Usuarios registrados</h2>
+            <p>Administra las cuentas y los cargos del personal.</p>
+        </div>
+
+        <a href="{% url 'usuarios:registrar' %}" class="btn-primary">
+            + Registrar usuario
+        </a>
+    </div>
+
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Nombre completo</th>
+                <th>Correo</th>
+                <th>Cargo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.username }}</td>
+
+                <td>{{ usuario.get_full_name|default:"Sin nombre" }}</td>
+
+                <td>{{ usuario.email|default:"Sin correo" }}</td>
+
+                <td>
+                    {% if usuario.perfil %}
+                        {{ usuario.perfil.get_cargo_display }}
+                    {% elif usuario.is_superuser %}
+                        Administrador
+                    {% else %}
+                        Sin perfil
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if usuario.is_active %}
+                        <span class="status active">Activo</span>
+                    {% else %}
+                        <span class="status inactive">Inactivo</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <div class="actions">
+
+                        {% if not usuario.is_superuser %}
+
+                            <a href="{% url 'usuarios:editar' usuario.id %}"
+                               class="btn-action btn-edit">
+                                Editar
+                            </a>
+
+                            <a href="{% url 'usuarios:cambiar_password' usuario.id %}"
+                               class="btn-action btn-password">
+                                Contraseña
+                            </a>
+
+                            {% if usuario.is_active %}
+                                <form method="post"
+                                      action="{% url 'usuarios:cambiar_estado' usuario.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn-action btn-disable">
+                                        Desactivar
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form method="post"
+                                      action="{% url 'usuarios:cambiar_estado' usuario.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn-action btn-enable">
+                                        Activar
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <a href="{% url 'usuarios:eliminar' usuario.id %}"
+                               class="btn-action btn-delete">
+                                Eliminar
+                            </a>
+
+                        {% else %}
+                            <span>Cuenta protegida</span>
+                        {% endif %}
+
+                    </div>
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="6" class="empty-state">
+                    Todavía no hay usuarios registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

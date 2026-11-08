@@ -1,0 +1,612 @@
+{% extends "base.html" %}
+
+{% block title %}Ventas | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / <strong>VENTAS</strong>
+{% endblock %}
+
+{% block page_title %}
+    Ventas
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sales-list {
+        display: grid;
+        gap: 22px;
+    }
+
+    /* ENCABEZADO */
+    .sales-list-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .sales-list-heading p {
+        color: #85808a;
+        margin: 0;
+    }
+
+    /* INDICADORES */
+    .sales-indicators {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .sales-indicator-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.035);
+        transition: transform .2s, box-shadow .2s;
+    }
+
+    .sales-indicator-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.06);
+    }
+
+    .sales-indicator-icon {
+        width: 52px;
+        height: 52px;
+        min-width: 52px;
+        border-radius: 13px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .icon-total {
+        background: #f8f0dc;
+        color: #a47a2b;
+    }
+
+    .icon-confirmed {
+        background: #e8f5ec;
+        color: #27834b;
+    }
+
+    .icon-money {
+        background: #f7e9ed;
+        color: #701e32;
+    }
+
+    .sales-indicator-card p {
+        margin: 0 0 5px;
+        font-size: 13px;
+        color: #85808a;
+    }
+
+    .sales-indicator-card h3 {
+        margin: 0;
+        font-size: 25px;
+        color: #29242b;
+    }
+
+    .sales-indicator-card small {
+        display: block;
+        margin-top: 5px;
+        color: #99919a;
+        font-size: 11px;
+    }
+
+    /* TARJETAS */
+    .sales-list-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 18px rgba(0,0,0,.035);
+    }
+
+    /* FILTROS */
+    .sales-filter-form {
+        display: grid;
+        grid-template-columns: minmax(200px, 1fr) 220px auto;
+        align-items: end;
+        gap: 15px;
+    }
+
+    .sales-filter-group {
+        display: grid;
+        gap: 8px;
+    }
+
+    .sales-filter-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .sales-filter-group input,
+    .sales-filter-group select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #e5e1e3;
+        border-radius: 9px;
+        background: #fff;
+        font: inherit;
+        color: #333;
+    }
+
+    .sales-filter-group input:focus,
+    .sales-filter-group select:focus {
+        outline: none;
+        border-color: #701e32;
+        box-shadow: 0 0 0 3px rgba(112,30,50,.08);
+    }
+
+    .sales-filter-actions {
+        display: flex;
+        gap: 9px;
+    }
+
+    /* TABLA */
+    .sales-table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .sales-table-header h3 {
+        margin: 0;
+    }
+
+    .sales-count {
+        color: #85808a;
+        font-size: 13px;
+    }
+
+    .sales-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .sales-table {
+        width: 100%;
+        min-width: 780px;
+        border-collapse: collapse;
+    }
+
+    .sales-table th {
+        padding: 15px 13px;
+        text-align: left;
+        background: #f8f5f6;
+        color: #817985;
+        font-size: 11px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .sales-table td {
+        padding: 16px 13px;
+        border-bottom: 1px solid #f0edef;
+        font-size: 13px;
+        color: #48434b;
+    }
+
+    .sales-table tbody tr:hover {
+        background: #fdfafb;
+    }
+
+    .sale-number {
+        color: #701e32;
+        font-weight: 700;
+    }
+
+    .sale-total {
+        font-weight: 800;
+        color: #29242b;
+        white-space: nowrap;
+    }
+
+    .sale-user {
+        font-weight: 600;
+    }
+
+    .sale-date {
+        white-space: nowrap;
+    }
+
+    /* ESTADOS */
+    .sale-status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-confirmada {
+        background: #e8f5ec;
+        color: #25804a;
+    }
+
+    .status-anulada {
+        background: #fdeaea;
+        color: #b43b3b;
+    }
+
+    .status-borrador {
+        background: #fff3dc;
+        color: #94651a;
+    }
+
+    /* ACCIONES */
+    .sale-action {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #eadde1;
+        border-radius: 8px;
+        color: #701e32;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background .2s;
+    }
+
+    .sale-action:hover {
+        background: #f8edf0;
+    }
+
+    /* SIN RESULTADOS */
+    .sales-empty {
+        padding: 45px 20px !important;
+        text-align: center;
+        color: #8b858d !important;
+    }
+
+    /* PAGINACIÓN */
+    .sales-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 22px;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .sales-pagination a {
+        text-decoration: none;
+        color: #701e32;
+        font-weight: 700;
+        padding: 8px 13px;
+        border: 1px solid #eadde1;
+        border-radius: 8px;
+    }
+
+    .sales-pagination a:hover {
+        background: #f8edf0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 850px) {
+        .sales-indicators {
+            grid-template-columns: 1fr;
+        }
+
+        .sales-filter-form {
+            grid-template-columns: 1fr;
+        }
+
+        .sales-filter-actions {
+            flex-wrap: wrap;
+        }
+
+        .sales-list-card {
+            padding: 16px;
+        }
+    }
+
+    /* TEMA OSCURO */
+    [data-theme="OSCURO"] .sales-indicator-card,
+    [data-theme="OSCURO"] .sales-list-card {
+        background: #242126;
+        border-color: #3b363e;
+        box-shadow: none;
+    }
+
+    [data-theme="OSCURO"] .sales-indicator-card h3,
+    [data-theme="OSCURO"] .sale-total,
+    [data-theme="OSCURO"] .sales-table-header h3 {
+        color: #f1edf0;
+    }
+
+    [data-theme="OSCURO"] .sales-indicator-card p,
+    [data-theme="OSCURO"] .sales-indicator-card small,
+    [data-theme="OSCURO"] .sales-count,
+    [data-theme="OSCURO"] .sales-list-heading p {
+        color: #aaa2ad;
+    }
+
+    [data-theme="OSCURO"] .sales-filter-group label,
+    [data-theme="OSCURO"] .sales-table td {
+        color: #d8d1d9;
+    }
+
+    [data-theme="OSCURO"] .sales-filter-group input,
+    [data-theme="OSCURO"] .sales-filter-group select {
+        background: #302c33;
+        border-color: #49424c;
+        color: #f1edf0;
+    }
+
+    [data-theme="OSCURO"] .sales-table th {
+        background: #302c33;
+        color: #bcb3bf;
+    }
+
+    [data-theme="OSCURO"] .sales-table td {
+        border-bottom-color: #3b363e;
+    }
+
+    [data-theme="OSCURO"] .sales-table tbody tr:hover {
+        background: #302c33;
+    }
+
+    [data-theme="OSCURO"] .sale-action,
+    [data-theme="OSCURO"] .sales-pagination a {
+        border-color: #60404b;
+        color: #e6aabb;
+    }
+
+    [data-theme="OSCURO"] .sale-action:hover,
+    [data-theme="OSCURO"] .sales-pagination a:hover {
+        background: #3b2b32;
+    }
+
+    [data-theme="OSCURO"] .sales-empty,
+    [data-theme="OSCURO"] .sales-pagination {
+        color: #aaa2ad !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="content-section sales-list">
+
+    <!-- ENCABEZADO -->
+    <div class="sales-list-heading">
+        <div>
+            <p>Consulta, busca y administra las operaciones del negocio.</p>
+        </div>
+
+        <a href="{% url 'ventas:crear' %}" class="btn btn-primary">
+            + Nueva venta
+        </a>
+    </div>
+
+    <!-- INDICADORES DE VENTAS -->
+    <div class="sales-indicators">
+
+        <div class="sales-indicator-card">
+            <div class="sales-indicator-icon icon-total">
+                <span>▤</span>
+            </div>
+
+            <div>
+                <p>Ventas registradas</p>
+                <h3>{{ indicadores.total_ventas }}</h3>
+                <small>Operaciones en el sistema</small>
+            </div>
+        </div>
+
+        <div class="sales-indicator-card">
+            <div class="sales-indicator-icon icon-confirmed">
+                <span>✓</span>
+            </div>
+
+            <div>
+                <p>Ventas confirmadas</p>
+                <h3>{{ indicadores.ventas_confirmadas }}</h3>
+                <small>Operaciones completadas</small>
+            </div>
+        </div>
+
+        <div class="sales-indicator-card">
+            <div class="sales-indicator-icon icon-money">
+                <span>Bs</span>
+            </div>
+
+            <div>
+                <p>Total vendido</p>
+                <h3>Bs {{ indicadores.total_vendido|floatformat:2 }}</h3>
+                <small>Importe de ventas confirmadas</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTROS -->
+    <div class="sales-list-card">
+
+        <form method="get" class="sales-filter-form">
+
+            <div class="sales-filter-group">
+                <label for="buscar">Buscar venta</label>
+
+                <input
+                    type="text"
+                    id="buscar"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="Número, usuario u observaciones..."
+                >
+            </div>
+
+            <div class="sales-filter-group">
+                <label for="estado">Estado de la venta</label>
+
+                <select name="estado" id="estado">
+                    <option value="">Todos los estados</option>
+
+                    {% for valor, etiqueta in estados %}
+                        <option
+                            value="{{ valor }}"
+                            {% if estado == valor %}selected{% endif %}
+                        >
+                            {{ etiqueta }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="sales-filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    Buscar
+                </button>
+
+                <a href="{% url 'ventas:lista' %}" class="btn btn-secondary">
+                    Limpiar
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- TABLA DE VENTAS -->
+    <div class="sales-list-card">
+
+        <div class="sales-table-header">
+            <h3>Ventas registradas</h3>
+
+            <span class="sales-count">
+                {{ page_obj.paginator.count }} registro(s)
+            </span>
+        </div>
+
+        <div class="sales-table-wrapper">
+
+            <table class="sales-table">
+
+                <thead>
+                    <tr>
+                        <th>N.º de venta</th>
+                        <th>Fecha</th>
+                        <th>Responsable</th>
+                        <th>Método de pago</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for venta in ventas %}
+                    <tr>
+
+                        <td>
+                            <span class="sale-number">
+                                {{ venta.numero }}
+                            </span>
+                        </td>
+
+                        <td class="sale-date">
+                            {{ venta.fecha|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            <span class="sale-user">
+                                {{ venta.usuario.username }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ venta.get_metodo_pago_display }}
+                        </td>
+
+                        <td>
+                            <span class="sale-total">
+                                Bs {{ venta.total|floatformat:2 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if venta.estado == "CONFIRMADA" %}
+                                <span class="sale-status status-confirmada">
+                                    Confirmada
+                                </span>
+
+                            {% elif venta.estado == "ANULADA" %}
+                                <span class="sale-status status-anulada">
+                                    Anulada
+                                </span>
+
+                            {% else %}
+                                <span class="sale-status status-borrador">
+                                    Borrador
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a
+                                href="{% url 'ventas:detalle' venta.pk %}"
+                                class="sale-action"
+                            >
+                                Ver detalle →
+                            </a>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="sales-empty">
+                            No se encontraron ventas registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- PAGINACIÓN -->
+        {% if page_obj.has_other_pages %}
+        <div class="sales-pagination">
+
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&estado={{ estado|urlencode }}">
+                    ← Anterior
+                </a>
+            {% endif %}
+
+            <span>
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&estado={{ estado|urlencode }}">
+                    Siguiente →
+                </a>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

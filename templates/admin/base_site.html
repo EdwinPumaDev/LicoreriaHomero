@@ -1,0 +1,149 @@
+
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Licorería Homero{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" class="homero-brand">
+        <span class="homero-logo">H</span>
+        <span>
+            <strong>LICORERÍA HOMERO</strong>
+            <small>Administración del sistema</small>
+        </span>
+    </a>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+    :root {
+        --homero-wine: #701E32;
+        --homero-wine-dark: #541626;
+        --homero-gold: #D4AF37;
+    }
+
+    #header {
+        background: var(--homero-wine);
+        color: #fff;
+        border-bottom: 3px solid var(--homero-gold);
+        padding: 14px 24px;
+    }
+
+    #branding {
+        display: flex;
+        align-items: center;
+    }
+
+    #site-name {
+        margin: 0;
+    }
+
+    .homero-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff !important;
+        text-decoration: none !important;
+    }
+
+    .homero-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: var(--homero-gold);
+        color: var(--homero-wine);
+        font-size: 24px;
+        font-weight: 900;
+    }
+
+    .homero-brand strong {
+        display: block;
+        color: #fff;
+        font-size: 17px;
+        letter-spacing: 1px;
+    }
+
+    .homero-brand small {
+        display: block;
+        margin-top: 3px;
+        color: #F0DCE1;
+        font-size: 11px;
+    }
+
+    #user-tools {
+        color: #fff;
+    }
+
+    #user-tools a {
+        color: #F4D77D !important;
+    }
+
+    #user-tools a:hover {
+        color: #fff !important;
+    }
+
+    .module h2,
+    .module caption,
+    .inline-group h2 {
+        background: var(--homero-wine);
+        color: #fff;
+    }
+
+    div.breadcrumbs {
+        background: var(--homero-wine-dark);
+        color: #F5E9EC;
+    }
+
+    div.breadcrumbs a {
+        color: var(--homero-gold);
+    }
+
+    .button,
+    input[type=submit],
+    input[type=button],
+    .submit-row input,
+    a.button {
+        background: var(--homero-wine);
+        border-radius: 6px;
+    }
+
+    .button:hover,
+    input[type=submit]:hover,
+    input[type=button]:hover,
+    .submit-row input:hover,
+    a.button:hover {
+        background: var(--homero-wine-dark);
+    }
+
+    .button.default,
+    input[type=submit].default,
+    .submit-row input.default {
+        background: var(--homero-wine);
+    }
+
+    #changelist-filter h2 {
+        background: var(--homero-wine);
+    }
+
+    #content h1 {
+        font-weight: 700;
+    }
+
+    @media (max-width: 767px) {
+        #header {
+            padding: 12px;
+        }
+
+        .homero-brand strong {
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %}
