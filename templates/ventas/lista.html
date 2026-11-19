@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Ventas | Licorería Homero{% endblock %}
@@ -17,7 +18,6 @@
         gap: 22px;
     }
 
-    /* ENCABEZADO */
     .sales-list-heading {
         display: flex;
         justify-content: space-between;
@@ -31,7 +31,6 @@
         margin: 0;
     }
 
-    /* INDICADORES */
     .sales-indicators {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -101,7 +100,6 @@
         font-size: 11px;
     }
 
-    /* TARJETAS */
     .sales-list-card {
         background: #fff;
         border: 1px solid #eee;
@@ -110,7 +108,6 @@
         box-shadow: 0 4px 18px rgba(0,0,0,.035);
     }
 
-    /* FILTROS */
     .sales-filter-form {
         display: grid;
         grid-template-columns: minmax(200px, 1fr) 220px auto;
@@ -153,7 +150,6 @@
         gap: 9px;
     }
 
-    /* TABLA */
     .sales-table-header {
         display: flex;
         justify-content: space-between;
@@ -177,7 +173,7 @@
 
     .sales-table {
         width: 100%;
-        min-width: 780px;
+        min-width: 880px;
         border-collapse: collapse;
     }
 
@@ -222,7 +218,29 @@
         white-space: nowrap;
     }
 
+    /* ORIGEN DE LA VENTA */
+
+    .sale-origin {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .origin-publico {
+        background: #e9f1ff;
+        color: #315c9b;
+    }
+
+    .origin-directa {
+        background: #e8f5ec;
+        color: #27834b;
+    }
+
     /* ESTADOS */
+
     .sale-status {
         display: inline-block;
         padding: 6px 11px;
@@ -247,7 +265,6 @@
         color: #94651a;
     }
 
-    /* ACCIONES */
     .sale-action {
         display: inline-block;
         padding: 8px 12px;
@@ -265,14 +282,12 @@
         background: #f8edf0;
     }
 
-    /* SIN RESULTADOS */
     .sales-empty {
         padding: 45px 20px !important;
         text-align: center;
         color: #8b858d !important;
     }
 
-    /* PAGINACIÓN */
     .sales-pagination {
         display: flex;
         justify-content: center;
@@ -296,7 +311,6 @@
         background: #f8edf0;
     }
 
-    /* RESPONSIVE */
     @media (max-width: 850px) {
         .sales-indicators {
             grid-template-columns: 1fr;
@@ -316,6 +330,7 @@
     }
 
     /* TEMA OSCURO */
+
     [data-theme="OSCURO"] .sales-indicator-card,
     [data-theme="OSCURO"] .sales-list-card {
         background: #242126;
@@ -379,11 +394,13 @@
 </style>
 {% endblock %}
 
+
 {% block content %}
 
 <section class="content-section sales-list">
 
     <!-- ENCABEZADO -->
+
     <div class="sales-list-heading">
         <div>
             <p>Consulta, busca y administra las operaciones del negocio.</p>
@@ -394,7 +411,9 @@
         </a>
     </div>
 
+
     <!-- INDICADORES DE VENTAS -->
+
     <div class="sales-indicators">
 
         <div class="sales-indicator-card">
@@ -435,7 +454,9 @@
 
     </div>
 
+
     <!-- FILTROS -->
+
     <div class="sales-list-card">
 
         <form method="get" class="sales-filter-form">
@@ -482,7 +503,9 @@
         </form>
     </div>
 
+
     <!-- TABLA DE VENTAS -->
+
     <div class="sales-list-card">
 
         <div class="sales-table-header">
@@ -503,6 +526,7 @@
                         <th>Fecha</th>
                         <th>Responsable</th>
                         <th>Método de pago</th>
+                        <th>Origen</th>
                         <th>Total</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -512,6 +536,7 @@
                 <tbody>
 
                     {% for venta in ventas %}
+
                     <tr>
 
                         <td>
@@ -532,6 +557,20 @@
 
                         <td>
                             {{ venta.get_metodo_pago_display }}
+                        </td>
+
+                        <!-- IDENTIFICACIÓN DEL ORIGEN -->
+
+                        <td>
+                            {% if venta.pedido_publico %}
+                                <span class="sale-origin origin-publico">
+                                    Pedido público
+                                </span>
+                            {% else %}
+                                <span class="sale-origin origin-directa">
+                                    Venta directa
+                                </span>
+                            {% endif %}
                         </td>
 
                         <td>
@@ -570,11 +609,13 @@
                     </tr>
 
                     {% empty %}
+
                     <tr>
-                        <td colspan="7" class="sales-empty">
+                        <td colspan="8" class="sales-empty">
                             No se encontraron ventas registradas.
                         </td>
                     </tr>
+
                     {% endfor %}
 
                 </tbody>
@@ -582,8 +623,11 @@
 
         </div>
 
+
         <!-- PAGINACIÓN -->
+
         {% if page_obj.has_other_pages %}
+
         <div class="sales-pagination">
 
             {% if page_obj.has_previous %}
@@ -603,6 +647,7 @@
             {% endif %}
 
         </div>
+
         {% endif %}
 
     </div>

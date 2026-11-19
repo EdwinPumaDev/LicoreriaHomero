@@ -1,5 +1,5 @@
-{% load static %}
 
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,6 +17,8 @@
             --texto: #292929;
             --gris: #777777;
             --borde: #E9E3DE;
+            --rojo: #A12626;
+            --verde: #16834B;
         }
 
         * {
@@ -29,12 +31,13 @@
             font-family: Arial, sans-serif;
             background: var(--fondo);
             color: var(--texto);
+            min-height: 100vh;
         }
 
         header {
             background: var(--vino-oscuro);
             color: white;
-            padding: 20px 7%;
+            padding: 18px 7%;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -44,10 +47,12 @@
         .marca {
             font-size: 22px;
             font-weight: bold;
+            white-space: nowrap;
         }
 
         header nav {
             display: flex;
+            align-items: center;
             gap: 22px;
             flex-wrap: wrap;
         }
@@ -56,6 +61,7 @@
             color: white;
             text-decoration: none;
             font-size: 14px;
+            transition: color .2s;
         }
 
         header a:hover {
@@ -64,11 +70,11 @@
 
         .contenedor {
             width: min(1100px, 90%);
-            margin: 45px auto;
+            margin: 42px auto;
         }
 
         .encabezado {
-            margin-bottom: 28px;
+            margin-bottom: 25px;
         }
 
         .encabezado h1 {
@@ -79,6 +85,7 @@
 
         .encabezado p {
             color: var(--gris);
+            line-height: 1.5;
         }
 
         .mensaje {
@@ -91,7 +98,7 @@
 
         .contenido {
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: minmax(0, 1fr) 320px;
             gap: 25px;
             align-items: start;
         }
@@ -100,28 +107,33 @@
         .resumen {
             background: var(--blanco);
             border: 1px solid var(--borde);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 22px;
         }
 
         .producto {
             display: grid;
-            grid-template-columns: 95px 1fr auto;
-            gap: 18px;
+            grid-template-columns: 95px minmax(0, 1fr) auto;
+            gap: 17px;
             align-items: center;
-            padding: 18px 0;
+            padding: 19px 0;
             border-bottom: 1px solid var(--borde);
+        }
+
+        .producto:first-child {
+            padding-top: 0;
         }
 
         .producto:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
 
         .imagen {
             width: 95px;
             height: 105px;
             background: #F4F0EC;
-            border-radius: 9px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -135,26 +147,28 @@
             object-fit: contain;
         }
 
+        .info {
+            min-width: 0;
+        }
+
         .info h3 {
             font-size: 17px;
+            line-height: 1.4;
             margin-bottom: 7px;
+            overflow-wrap: anywhere;
         }
 
         .info p {
             font-size: 13px;
             color: var(--gris);
             margin-bottom: 7px;
-        }
-
-        .precio {
-            color: var(--vino);
-            font-weight: bold;
+            line-height: 1.4;
         }
 
         .acciones {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 9px;
             flex-wrap: wrap;
             margin-top: 12px;
         }
@@ -166,21 +180,37 @@
         }
 
         .form-cantidad input {
-            width: 65px;
+            width: 68px;
+            height: 38px;
             padding: 8px;
             border: 1px solid var(--borde);
-            border-radius: 6px;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-cantidad input:focus {
+            border-color: var(--vino);
         }
 
         button,
         .boton {
             border: none;
-            border-radius: 6px;
-            padding: 9px 13px;
+            border-radius: 7px;
+            padding: 10px 13px;
             cursor: pointer;
             font-size: 13px;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: background .2s, transform .2s;
+        }
+
+        button:hover,
+        .boton:hover {
+            transform: translateY(-1px);
         }
 
         .actualizar {
@@ -188,9 +218,24 @@
             color: white;
         }
 
+        .actualizar:hover {
+            background: var(--vino-oscuro);
+        }
+
         .eliminar {
             background: #F8E9E9;
-            color: #A12626;
+            color: var(--rojo);
+        }
+
+        .eliminar:hover {
+            background: #F3DADA;
+        }
+
+        .producto-subtotal {
+            text-align: right;
+            white-space: nowrap;
+            align-self: center;
+            font-size: 16px;
         }
 
         .resumen h2 {
@@ -222,14 +267,14 @@
             background: var(--vino);
             color: white;
             padding: 14px;
-            border-radius: 7px;
+            border-radius: 8px;
             text-decoration: none;
             margin-top: 22px;
             font-weight: bold;
+            transition: .2s;
         }
 
-        .finalizar:hover,
-        .actualizar:hover {
+        .finalizar:hover {
             background: var(--vino-oscuro);
         }
 
@@ -239,6 +284,10 @@
             color: var(--vino);
             text-decoration: none;
             font-weight: bold;
+        }
+
+        .seguir:hover {
+            text-decoration: underline;
         }
 
         .vacio {
@@ -262,31 +311,201 @@
         .vacio p {
             color: var(--gris);
             margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        @media (max-width: 750px) {
+        .vacio .finalizar {
+            max-width: 260px;
+            margin: 20px auto 0;
+        }
+
+        /* TABLETS */
+        @media (max-width: 850px) {
             .contenido {
                 grid-template-columns: 1fr;
             }
 
+            .resumen {
+                width: 100%;
+            }
+
             header {
-                flex-direction: column;
-                align-items: flex-start;
+                padding: 17px 5%;
             }
         }
 
-        @media (max-width: 500px) {
+        /* CELULARES */
+        @media (max-width: 600px) {
+            header {
+                padding: 17px 5%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 13px;
+            }
+
+            .marca {
+                font-size: 21px;
+            }
+
+            header nav {
+                width: 100%;
+                gap: 20px;
+            }
+
+            header a {
+                font-size: 14px;
+            }
+
+            .contenedor {
+                width: 92%;
+                margin: 27px auto;
+            }
+
+            .encabezado {
+                margin-bottom: 20px;
+            }
+
+            .encabezado h1 {
+                font-size: 27px;
+            }
+
+            .encabezado p {
+                font-size: 14px;
+            }
+
+            .contenido {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 17px;
+            }
+
+            .productos {
+                padding: 14px;
+            }
+
             .producto {
-                grid-template-columns: 75px 1fr;
+                grid-template-columns: 72px minmax(0, 1fr);
+                gap: 12px;
+                padding: 17px 0;
+            }
+
+            .producto:first-child {
+                padding-top: 3px;
             }
 
             .imagen {
-                width: 75px;
-                height: 85px;
+                width: 72px;
+                height: 86px;
+                border-radius: 9px;
+                font-size: 29px;
+            }
+
+            .info h3 {
+                font-size: 15px;
+                line-height: 1.35;
+                margin-bottom: 6px;
+            }
+
+            .info p {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            .acciones {
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                gap: 7px;
+                margin-top: 10px;
+            }
+
+            .form-cantidad {
+                gap: 6px;
+                flex: 0 1 auto;
+            }
+
+            .form-cantidad input {
+                width: 52px;
+                min-width: 0;
+                height: 36px;
+                padding: 7px;
+            }
+
+            button {
+                padding: 9px 10px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .eliminar {
+                flex-shrink: 0;
             }
 
             .producto-subtotal {
                 grid-column: 2;
+                justify-self: end;
+                text-align: right;
+                font-size: 15px;
+                margin-top: 2px;
+            }
+
+            .resumen {
+                padding: 19px;
+            }
+
+            .resumen h2 {
+                font-size: 19px;
+            }
+
+            .total {
+                font-size: 18px;
+            }
+
+            .finalizar {
+                padding: 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* CELULARES PEQUEÑOS */
+        @media (max-width: 360px) {
+            .contenedor {
+                width: 94%;
+            }
+
+            .productos {
+                padding: 11px;
+            }
+
+            .producto {
+                grid-template-columns: 62px minmax(0, 1fr);
+                gap: 9px;
+            }
+
+            .imagen {
+                width: 62px;
+                height: 76px;
+            }
+
+            .info h3 {
+                font-size: 14px;
+            }
+
+            .acciones {
+                gap: 5px;
+            }
+
+            .form-cantidad {
+                gap: 4px;
+            }
+
+            .form-cantidad input {
+                width: 43px;
+                padding: 5px;
+            }
+
+            button {
+                padding: 9px 7px;
+                font-size: 11px;
             }
         }
     </style>
@@ -295,7 +514,9 @@
 <body>
 
 <header>
-    <div class="marca">🍷 LICORERÍA HOMERO</div>
+    <div class="marca">
+        🍷 LICORERÍA HOMERO
+    </div>
 
     <nav>
         <a href="{% url 'publico:inicio' %}">Inicio</a>
@@ -313,7 +534,9 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="mensaje">{{ message }}</div>
+            <div class="mensaje">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endif %}
 
@@ -329,14 +552,17 @@
 
                         <div class="imagen">
                             {% if item.producto.imagen %}
-                                <img src="{{ item.producto.imagen.url }}"
-                                     alt="{{ item.producto.nombre }}">
+                                <img
+                                    src="{{ item.producto.imagen.url }}"
+                                    alt="{{ item.producto.nombre }}"
+                                >
                             {% else %}
                                 🍾
                             {% endif %}
                         </div>
 
                         <div class="info">
+
                             <h3>{{ item.producto.nombre }}</h3>
 
                             <p>
@@ -350,10 +576,11 @@
 
                             <div class="acciones">
 
-                                <form method="POST"
-                                      action="{% url 'publico:actualizar_carrito' item.producto.id %}"
-                                      class="form-cantidad">
-
+                                <form
+                                    method="POST"
+                                    action="{% url 'publico:actualizar_carrito' item.producto.id %}"
+                                    class="form-cantidad"
+                                >
                                     {% csrf_token %}
 
                                     <input
@@ -363,26 +590,27 @@
                                         min="1"
                                         max="{{ item.producto.stock }}"
                                         required
+                                        aria-label="Cantidad de {{ item.producto.nombre }}"
                                     >
 
                                     <button type="submit" class="actualizar">
                                         Actualizar
                                     </button>
-
                                 </form>
 
-                                <form method="POST"
-                                      action="{% url 'publico:eliminar_carrito' item.producto.id %}">
-
+                                <form
+                                    method="POST"
+                                    action="{% url 'publico:eliminar_carrito' item.producto.id %}"
+                                >
                                     {% csrf_token %}
 
                                     <button type="submit" class="eliminar">
                                         Eliminar
                                     </button>
-
                                 </form>
 
                             </div>
+
                         </div>
 
                         <div class="producto-subtotal">
@@ -411,11 +639,17 @@
                     <span>Bs {{ total|floatformat:2 }}</span>
                 </div>
 
-                <a href="{% url 'publico:catalogo' %}" class="seguir">
+                <a
+                    href="{% url 'publico:catalogo' %}"
+                    class="seguir"
+                >
                     ← Seguir comprando
                 </a>
 
-                <a href="#" class="finalizar">
+                <a
+                    href="{% url 'publico:crear_pedido' %}"
+                    class="finalizar"
+                >
                     Continuar con el pedido
                 </a>
 
@@ -426,6 +660,7 @@
     {% else %}
 
         <section class="vacio">
+
             <div class="icono">🛒</div>
 
             <h2>Tu carrito está vacío</h2>
@@ -435,9 +670,13 @@
                 Explora nuestro catálogo y encuentra lo que buscas.
             </p>
 
-            <a href="{% url 'publico:catalogo' %}" class="finalizar">
+            <a
+                href="{% url 'publico:catalogo' %}"
+                class="finalizar"
+            >
                 Explorar catálogo
             </a>
+
         </section>
 
     {% endif %}

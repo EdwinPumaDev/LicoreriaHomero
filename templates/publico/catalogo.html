@@ -1,13 +1,25 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Catálogo | Licorería Homero</title>
 
     <style>
+        :root {
+            --guinda: #701e32;
+            --guinda-dark: #351421;
+            --dorado: #d4af37;
+            --fondo: #faf8f7;
+            --texto: #30272a;
+            --suave: #81777b;
+            --borde: #eee6e8;
+            --blanco: #fff;
+            --verde: #27834b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,79 +28,100 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: #faf8f7;
-            color: #30272a;
+            background: var(--fondo);
+            color: var(--texto);
+        }
+
+        a {
+            text-decoration: none;
         }
 
         /* NAVEGACIÓN */
 
         .navbar {
-            background: #701e32;
+            background: var(--guinda);
             color: white;
-            padding: 18px 7%;
+            min-height: 76px;
+            padding: 16px 7%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 3px 15px rgba(0,0,0,.12);
         }
 
         .brand {
-            font-size: 23px;
-            font-weight: bold;
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
         .brand span {
-            color: #d4af37;
+            color: var(--dorado);
         }
 
         .navbar nav {
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             gap: 22px;
         }
 
-        .navbar a {
+        .navbar nav a {
             color: white;
-            text-decoration: none;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            transition: color .2s;
         }
 
-        .navbar a:hover {
-            color: #d4af37;
+        .navbar nav a:hover {
+            color: var(--dorado);
+        }
+
+        .nav-cart {
+            border: 1px solid rgba(255,255,255,.35);
+            padding: 10px 15px;
+            border-radius: 8px;
         }
 
         /* PORTADA */
 
         .catalog-hero {
-            background: linear-gradient(110deg, #351421, #701e32);
+            background:
+                radial-gradient(circle at 85% 30%, rgba(212,175,55,.13), transparent 25%),
+                linear-gradient(110deg, var(--guinda-dark), var(--guinda));
             color: white;
-            padding: 55px 7%;
+            padding: 65px 7%;
             text-align: center;
         }
 
         .catalog-hero span {
-            color: #d4af37;
+            color: var(--dorado);
             font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-weight: 800;
+            letter-spacing: 3px;
         }
 
         .catalog-hero h1 {
-            font-size: 36px;
-            margin: 13px 0;
+            font-size: clamp(32px, 4vw, 43px);
+            margin: 15px 0;
         }
 
         .catalog-hero p {
             color: #e7dce0;
             font-size: 15px;
+            line-height: 1.7;
         }
 
         /* CONTENIDO */
 
         .catalog-container {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: auto;
             padding: 45px 7%;
         }
@@ -98,44 +131,48 @@
         }
 
         .catalog-heading h2 {
-            color: #701e32;
-            font-size: 25px;
-            margin-bottom: 8px;
+            color: var(--guinda);
+            font-size: 26px;
+            margin-bottom: 9px;
         }
 
         .catalog-heading p {
-            color: #81777b;
+            color: var(--suave);
             font-size: 14px;
+            line-height: 1.7;
         }
 
         /* FILTROS */
 
         .filters {
             background: white;
-            border: 1px solid #eee6e8;
-            border-radius: 12px;
+            border: 1px solid var(--borde);
+            border-radius: 14px;
             padding: 20px;
             display: grid;
-            grid-template-columns: 1fr 240px auto auto;
+            grid-template-columns: minmax(180px, 1fr) 240px auto auto;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.025);
         }
 
         .filters input,
         .filters select {
             width: 100%;
-            padding: 13px;
+            min-width: 0;
+            padding: 14px;
             border: 1px solid #e5dce0;
-            border-radius: 8px;
+            border-radius: 9px;
             font-size: 14px;
             background: white;
-            color: #30272a;
+            color: var(--texto);
         }
 
         .filters input:focus,
         .filters select:focus {
             outline: none;
-            border-color: #701e32;
+            border-color: var(--guinda);
+            box-shadow: 0 0 0 3px rgba(112,30,50,.08);
         }
 
         .filter-button,
@@ -143,17 +180,17 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            padding: 13px 20px;
-            border-radius: 8px;
+            padding: 13px 21px;
+            border-radius: 9px;
             font-size: 13px;
-            font-weight: bold;
-            text-decoration: none;
+            font-weight: 800;
             cursor: pointer;
             border: none;
+            transition: .2s;
         }
 
         .filter-button {
-            background: #701e32;
+            background: var(--guinda);
             color: white;
         }
 
@@ -163,7 +200,7 @@
 
         .clear-button {
             background: #f1ecee;
-            color: #701e32;
+            color: var(--guinda);
         }
 
         .clear-button:hover {
@@ -177,11 +214,11 @@
         }
 
         .message {
-            padding: 13px 16px;
+            padding: 14px 17px;
             margin-bottom: 10px;
-            border-radius: 8px;
+            border-radius: 9px;
             background: #e8f5ec;
-            color: #27834b;
+            color: var(--verde);
             font-size: 14px;
         }
 
@@ -190,86 +227,117 @@
         .products-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 22px;
+            gap: 23px;
         }
 
         .product-card {
+            min-width: 0;
             background: white;
-            border: 1px solid #eee6e8;
-            border-radius: 13px;
+            border: 1px solid var(--borde);
+            border-radius: 15px;
             overflow: hidden;
-            transition: .2s;
+            display: flex;
+            flex-direction: column;
+            transition: transform .25s, box-shadow .25s;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+            transform: translateY(-6px);
+            box-shadow: 0 13px 28px rgba(0,0,0,.09);
         }
 
         .product-image {
-            height: 235px;
-            background: #f5f1f2;
+            height: 245px;
+            background: linear-gradient(145deg, #f8f4f5, #f1ebed);
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            position: relative;
         }
 
         .product-image img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            padding: 12px;
+            padding: 17px;
+            transition: transform .35s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.07);
         }
 
         .product-placeholder {
-            font-size: 65px;
-            color: #c8b9bf;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            color: #a89ba0;
+        }
+
+        .product-placeholder span {
+            font-size: 58px;
+        }
+
+        .product-placeholder small {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .product-info {
-            padding: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .product-category {
             color: #a47a2b;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: .8px;
+            letter-spacing: .9px;
         }
 
         .product-info h3 {
-            color: #30272a;
+            color: var(--texto);
             font-size: 16px;
-            margin: 9px 0;
-            min-height: 38px;
+            line-height: 1.45;
+            margin: 10px 0;
+            min-height: 46px;
         }
 
         .product-brand {
-            color: #81777b;
+            color: var(--suave);
             font-size: 13px;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .product-price {
-            color: #701e32;
-            font-size: 21px;
-            font-weight: bold;
+            color: var(--guinda);
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: auto;
         }
 
         .product-stock {
             display: inline-block;
-            margin-top: 12px;
-            padding: 6px 10px;
+            align-self: flex-start;
+            margin-top: 13px;
+            padding: 7px 11px;
             border-radius: 20px;
             background: #e8f5ec;
-            color: #27834b;
+            color: var(--verde);
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 800;
         }
 
-        /* BOTÓN AGREGAR AL CARRITO */
+        /* CARRITO */
 
         .cart-form {
             margin-top: 17px;
@@ -277,19 +345,24 @@
 
         .add-cart-button {
             width: 100%;
-            padding: 12px 15px;
-            background: #701e32;
+            padding: 14px 12px;
+            background: var(--guinda);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             transition: .2s;
         }
 
         .add-cart-button:hover {
             background: #8b2942;
+            box-shadow: 0 5px 13px rgba(112,30,50,.18);
+        }
+
+        .add-cart-button:active {
+            transform: scale(.98);
         }
 
         /* SIN RESULTADOS */
@@ -298,15 +371,26 @@
             grid-column: 1 / -1;
             background: white;
             border: 1px dashed #d9cbd0;
-            border-radius: 12px;
-            padding: 55px 20px;
+            border-radius: 14px;
+            padding: 60px 20px;
             text-align: center;
-            color: #81777b;
+            color: var(--suave);
+        }
+
+        .empty-results .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
         }
 
         .empty-results h3 {
-            color: #701e32;
+            color: var(--guinda);
             margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .empty-results p {
+            font-size: 14px;
+            line-height: 1.7;
         }
 
         /* PIE DE PÁGINA */
@@ -314,19 +398,37 @@
         .footer {
             background: #27151c;
             color: #e9dfe3;
-            padding: 35px 7%;
+            padding: 40px 7% 25px;
             text-align: center;
         }
 
         .footer h3 {
-            color: #d4af37;
-            margin-bottom: 10px;
+            color: var(--dorado);
+            font-size: 23px;
+            margin-bottom: 12px;
         }
 
         .footer p {
             color: #c5b9bf;
             font-size: 13px;
             line-height: 1.8;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 22px;
+            margin: 20px 0;
+        }
+
+        .footer-links a {
+            color: #e9dfe3;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: var(--dorado);
         }
 
         .footer-bottom {
@@ -339,7 +441,7 @@
 
         /* RESPONSIVE */
 
-        @media (max-width: 1050px) {
+        @media (max-width: 1100px) {
             .products-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
@@ -357,25 +459,63 @@
 
             .navbar nav {
                 justify-content: center;
+                gap: 15px;
             }
 
             .products-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .catalog-hero h1 {
-                font-size: 28px;
+            .catalog-hero {
+                padding: 48px 5%;
+            }
+
+            .catalog-container {
+                padding: 35px 5%;
             }
         }
 
         @media (max-width: 480px) {
+            .navbar {
+                padding: 17px 5%;
+            }
+
+            .brand {
+                font-size: 21px;
+            }
+
+            .navbar nav {
+                gap: 12px;
+            }
+
+            .navbar nav a {
+                font-size: 12px;
+            }
+
             .products-grid,
             .filters {
                 grid-template-columns: 1fr;
             }
 
+            .product-image {
+                height: 250px;
+            }
+
+            .catalog-hero h1 {
+                font-size: 29px;
+            }
+
             .catalog-container {
                 padding: 30px 5%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
             }
         }
     </style>
@@ -387,22 +527,25 @@
 
     <header class="navbar">
 
-        <div class="brand">
+        <a href="{% url 'publico:inicio' %}" class="brand">
             Licorería <span>Homero</span>
-        </div>
+        </a>
 
         <nav>
             <a href="{% url 'publico:inicio' %}">Inicio</a>
             <a href="{% url 'publico:catalogo' %}">Productos</a>
+            <a href="{% url 'publico:inicio' %}#categorias">Categorías</a>
             <a href="{% url 'publico:inicio' %}#nosotros">Nosotros</a>
             <a href="{% url 'publico:inicio' %}#contacto">Contacto</a>
-            <a href="{% url 'publico:carrito' %}">🛒 Mi carrito</a>
+            <a href="{% url 'publico:carrito' %}" class="nav-cart">
+                🛒 Mi carrito
+            </a>
         </nav>
 
     </header>
 
 
-    <!-- PORTADA DEL CATÁLOGO -->
+    <!-- PORTADA -->
 
     <section class="catalog-hero">
 
@@ -427,6 +570,7 @@
 
             <p>
                 Explora los productos disponibles en nuestra licorería.
+                Selecciona tus favoritos y agrégalos al carrito.
             </p>
 
         </div>
@@ -454,9 +598,10 @@
                 name="q"
                 placeholder="Buscar producto por nombre..."
                 value="{{ busqueda }}"
+                aria-label="Buscar producto por nombre"
             >
 
-            <select name="categoria">
+            <select name="categoria" aria-label="Filtrar por categoría">
 
                 <option value="">Todas las categorías</option>
 
@@ -476,7 +621,7 @@
             </select>
 
             <button type="submit" class="filter-button">
-                Buscar
+                🔎 Buscar
             </button>
 
             <a
@@ -504,17 +649,26 @@
                             <img
                                 src="{{ producto.imagen.url }}"
                                 alt="{{ producto.nombre }}"
+                                loading="lazy"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                             >
+
+                            <div class="product-placeholder" style="display:none;">
+                                <span>🍾</span>
+                                <small>IMAGEN NO DISPONIBLE</small>
+                            </div>
 
                         {% else %}
 
                             <div class="product-placeholder">
-                                🍾
+                                <span>🍾</span>
+                                <small>FOTOGRAFÍA PENDIENTE</small>
                             </div>
 
                         {% endif %}
 
                     </div>
+
 
                     <div class="product-info">
 
@@ -522,14 +676,12 @@
                             {{ producto.categoria.nombre }}
                         </span>
 
-                        <h3>
-                            {{ producto.nombre }}
-                        </h3>
+                        <h3>{{ producto.nombre }}</h3>
 
                         <p class="product-brand">
 
                             {% if producto.marca %}
-                                {{ producto.marca.nombre }}
+                                Marca: {{ producto.marca.nombre }}
                             {% else %}
                                 Sin marca
                             {% endif %}
@@ -541,8 +693,9 @@
                         </div>
 
                         <span class="product-stock">
-                            Disponible
+                            ✓ Disponible
                         </span>
+
 
                         <!-- AGREGAR AL CARRITO -->
 
@@ -567,6 +720,8 @@
             {% empty %}
 
                 <div class="empty-results">
+
+                    <div class="empty-icon">🔎</div>
 
                     <h3>No encontramos productos</h3>
 
@@ -597,6 +752,16 @@
         <p>
             Vallegrande - Santa Cruz, Bolivia
         </p>
+
+        <div class="footer-links">
+
+            <a href="{% url 'publico:inicio' %}">Inicio</a>
+
+            <a href="{% url 'publico:catalogo' %}">Productos</a>
+
+            <a href="{% url 'publico:carrito' %}">Mi carrito</a>
+
+        </div>
 
         <div class="footer-bottom">
             © 2026 Licorería Homero. Todos los derechos reservados.

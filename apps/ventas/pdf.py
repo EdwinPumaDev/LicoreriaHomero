@@ -2,7 +2,9 @@
 from io import BytesIO
 from xml.sax.saxutils import escape
 
-from django.http import HttpResponse, Http404
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from reportlab.lib import colors
@@ -19,6 +21,12 @@ from reportlab.platypus import (
     HRFlowable,
 )
 
+from apps.ventas.models import Venta
+from apps.usuarios.permisos import (
+    todos_los_cargos,
+    es_vendedor,
+)
+
 
 BORGOÑA = colors.HexColor("#701E32")
 GRIS = colors.HexColor("#66616A")
@@ -26,25 +34,37 @@ GRIS_CLARO = colors.HexColor("#F6F3F4")
 GRIS_LINEA = colors.HexColor("#E8E2E4")
 
 
+# ==========================================================
+# GENERAR COMPROBANTE PDF CON CONTROL DE PERMISOS
+# ==========================================================
+
+@login_required
+@todos_los_cargos
 def generar_comprobante_pdf(request, pk):
-    from apps.ventas.models import Venta
 
-    try:
-        venta = (
-            Venta.objects
-            .select_related("usuario")
-            .prefetch_related("detalles__producto")
-            .get(pk=pk)
-        )
-    except Venta.DoesNotExist:
-        raise Http404("La venta no existe.")
+    # Obtener las ventas disponibles para el usuario.
+    ventas = Venta.objects.select_related(
+        "usuario"
+    ).prefetch_related(
+        "detalles__producto"
+    )
 
-    if venta.estado != Venta.Estado.CONFIRMADA:
-        raise Http404("Solo se permiten comprobantes de ventas confirmadas.")
+    # El vendedor solamente puede acceder a sus propias ventas.
+    if es_vendedor(request.user):
+        ventas = ventas.filter(usuario=request.user)
+
+    # Si la venta no existe o pertenece a otro usuario,
+    # se devuelve una respuesta 404.
+    venta = get_object_or_404(
+        ventas,
+        pk=pk,
+        estado=Venta.Estado.CONFIRMADA,
+    )
 
     detalles = list(venta.detalles.all())
 
     if not detalles:
+        from django.http import Http404
         raise Http404("La venta no contiene productos.")
 
     buffer = BytesIO()
@@ -145,7 +165,9 @@ def generar_comprobante_pdf(request, pk):
 
     elementos = []
 
+    # ======================================================
     # ENCABEZADO
+    # ======================================================
 
     marca = Table(
         [[Paragraph(
@@ -176,9 +198,13 @@ def generar_comprobante_pdf(request, pk):
     titulo = [
         Paragraph("COMPROBANTE<br/>DE VENTA", estilos["TituloPDF"]),
         Spacer(1, 3 * mm),
-        Paragraph(f"<b>N.º:</b> {escape(venta.numero)}", estilos["NormalPDF"]),
         Paragraph(
-            f"<b>Fecha:</b> {timezone.localtime(venta.fecha).strftime('%d/%m/%Y %H:%M')}",
+            f"<b>N.º:</b> {escape(venta.numero)}",
+            estilos["NormalPDF"],
+        ),
+        Paragraph(
+            f"<b>Fecha:</b> "
+            f"{timezone.localtime(venta.fecha).strftime('%d/%m/%Y %H:%M')}",
             estilos["NormalPDF"],
         ),
     ]
@@ -205,7 +231,9 @@ def generar_comprobante_pdf(request, pk):
         spaceAfter=5 * mm,
     ))
 
+    # ======================================================
     # INFORMACIÓN DE LA VENTA
+    # ======================================================
 
     informacion = [
         [
@@ -214,9 +242,18 @@ def generar_comprobante_pdf(request, pk):
             Paragraph("<b>ESTADO</b>", estilos["NormalPDF"]),
         ],
         [
-            Paragraph(escape(venta.usuario.username), estilos["NegritaPDF"]),
-            Paragraph(escape(venta.get_metodo_pago_display()), estilos["NegritaPDF"]),
-            Paragraph("<font color='#25804A'><b>CONFIRMADA</b></font>", estilos["NegritaPDF"]),
+            Paragraph(
+                escape(venta.usuario.username),
+                estilos["NegritaPDF"],
+            ),
+            Paragraph(
+                escape(venta.get_metodo_pago_display()),
+                estilos["NegritaPDF"],
+            ),
+            Paragraph(
+                "<font color='#25804A'><b>CONFIRMADA</b></font>",
+                estilos["NegritaPDF"],
+            ),
         ],
     ]
 
@@ -238,7 +275,9 @@ def generar_comprobante_pdf(request, pk):
     elementos.append(tabla_info)
     elementos.append(Spacer(1, 6 * mm))
 
+    # ======================================================
     # PRODUCTOS
+    # ======================================================
 
     elementos.append(Paragraph(
         "<b>DETALLE DE PRODUCTOS</b>",
@@ -257,11 +296,23 @@ def generar_comprobante_pdf(request, pk):
 
     for detalle in detalles:
         datos.append([
-            Paragraph(escape(detalle.producto.nombre), estilos["TablaPDF"]),
+            Paragraph(
+                escape(detalle.producto.nombre),
+                estilos["TablaPDF"],
+            ),
             Paragraph(str(detalle.cantidad), estilos["TablaPDF"]),
-            Paragraph(f"{detalle.precio_unitario:,.2f}", estilos["TablaPDF"]),
-            Paragraph(f"{detalle.descuento:,.2f}", estilos["TablaPDF"]),
-            Paragraph(f"{detalle.subtotal:,.2f}", estilos["NegritaPDF"]),
+            Paragraph(
+                f"{detalle.precio_unitario:,.2f}",
+                estilos["TablaPDF"],
+            ),
+            Paragraph(
+                f"{detalle.descuento:,.2f}",
+                estilos["TablaPDF"],
+            ),
+            Paragraph(
+                f"{detalle.subtotal:,.2f}",
+                estilos["NegritaPDF"],
+            ),
         ])
 
     tabla_productos = Table(
@@ -285,16 +336,24 @@ def generar_comprobante_pdf(request, pk):
     elementos.append(tabla_productos)
     elementos.append(Spacer(1, 6 * mm))
 
+    # ======================================================
     # RESUMEN
+    # ======================================================
 
     resumen = [
         [
             Paragraph("Subtotal", estilos["NormalPDF"]),
-            Paragraph(f"Bs {venta.subtotal:,.2f}", estilos["NormalPDF"]),
+            Paragraph(
+                f"Bs {venta.subtotal:,.2f}",
+                estilos["NormalPDF"],
+            ),
         ],
         [
             Paragraph("Descuento general", estilos["NormalPDF"]),
-            Paragraph(f"Bs {venta.descuento:,.2f}", estilos["NormalPDF"]),
+            Paragraph(
+                f"Bs {venta.descuento:,.2f}",
+                estilos["NormalPDF"],
+            ),
         ],
     ]
 
@@ -316,7 +375,10 @@ def generar_comprobante_pdf(request, pk):
     total = Table(
         [[
             Paragraph("TOTAL PAGADO", estilos["NegritaPDF"]),
-            Paragraph(f"Bs {venta.total:,.2f}", estilos["TotalPDF"]),
+            Paragraph(
+                f"Bs {venta.total:,.2f}",
+                estilos["TotalPDF"],
+            ),
         ]],
         colWidths=[38 * mm, 30 * mm],
         hAlign="RIGHT",
@@ -334,18 +396,28 @@ def generar_comprobante_pdf(request, pk):
 
     elementos.append(total)
 
+    # ======================================================
     # OBSERVACIONES
+    # ======================================================
 
     if venta.observaciones:
         elementos.append(Spacer(1, 5 * mm))
-        elementos.append(Paragraph("<b>OBSERVACIONES</b>", estilos["NegritaPDF"]))
+
+        elementos.append(Paragraph(
+            "<b>OBSERVACIONES</b>",
+            estilos["NegritaPDF"],
+        ))
+
         elementos.append(Spacer(1, 2 * mm))
+
         elementos.append(Paragraph(
             escape(venta.observaciones).replace("\n", "<br/>"),
             estilos["NormalPDF"],
         ))
 
-    # PIE
+    # ======================================================
+    # PIE DEL COMPROBANTE
+    # ======================================================
 
     elementos.append(Spacer(1, 8 * mm))
 

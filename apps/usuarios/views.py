@@ -15,6 +15,7 @@ from apps.usuarios.forms import (
     UsuarioEditarForm,
     UsuarioCambiarPasswordForm,
 )
+from apps.usuarios.permisos import es_vendedor
 
 
 # ==========================================================
@@ -334,9 +335,16 @@ def eliminar_usuario(request, usuario_id):
 @login_required
 def dashboard(request):
 
+    # Obtener todas las ventas confirmadas.
     ventas_confirmadas = Venta.objects.filter(
         estado=Venta.Estado.CONFIRMADA
     )
+
+    # El vendedor solamente consulta sus propias ventas.
+    if es_vendedor(request.user):
+        ventas_confirmadas = ventas_confirmadas.filter(
+            usuario=request.user
+        )
 
     total_ventas = ventas_confirmadas.count()
 
@@ -344,6 +352,7 @@ def dashboard(request):
         total=Sum("total")
     )["total"] or 0
 
+    # La información del inventario es compartida.
     productos_activos = Producto.objects.filter(
         activo=True
     ).count()
@@ -353,6 +362,7 @@ def dashboard(request):
         stock__lte=F("stock_minimo"),
     ).count()
 
+    # Las últimas ventas respetan el filtro del cargo.
     ultimas_ventas = ventas_confirmadas.order_by(
         "-fecha"
     )[:5]

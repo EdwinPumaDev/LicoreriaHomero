@@ -22,7 +22,25 @@ from apps.ventas.services import (
 from apps.usuarios.permisos import (
     todos_los_cargos,
     administrador_o_encargado,
+    es_vendedor,
 )
+
+
+# ==========================================================
+# CONTROL DE VENTAS VISIBLES SEGÚN EL CARGO
+# ==========================================================
+
+def ventas_visibles_para(usuario):
+    """
+    Administrador y encargado pueden consultar todas las ventas.
+    El vendedor solamente puede consultar sus propias ventas.
+    """
+    ventas = Venta.objects.all()
+
+    if es_vendedor(usuario):
+        ventas = ventas.filter(usuario=usuario)
+
+    return ventas
 
 
 # ==========================================================
@@ -36,7 +54,8 @@ def lista_ventas(request):
     q = request.GET.get("q", "").strip()
     estado = request.GET.get("estado", "").strip()
 
-    todas_las_ventas = Venta.objects.all()
+    # El vendedor solamente obtiene sus propias ventas.
+    todas_las_ventas = ventas_visibles_para(request.user)
 
     indicadores = todas_las_ventas.aggregate(
         total_ventas=Count("id"),
@@ -66,7 +85,9 @@ def lista_ventas(request):
         indicadores["total_vendido"] or Decimal("0.00")
     )
 
-    ventas = Venta.objects.select_related("usuario").all()
+    ventas = ventas_visibles_para(request.user).select_related(
+        "usuario"
+    )
 
     if q:
         ventas = ventas.filter(
@@ -148,8 +169,9 @@ def crear_venta(request):
 @todos_los_cargos
 def detalle_venta(request, pk):
 
+    # Impide que un vendedor acceda a ventas de otros usuarios.
     venta = get_object_or_404(
-        Venta.objects.select_related("usuario"),
+        ventas_visibles_para(request.user).select_related("usuario"),
         pk=pk,
     )
 
@@ -169,8 +191,12 @@ def detalle_venta(request, pk):
             try:
                 with transaction.atomic():
 
-                    venta = Venta.objects.select_for_update().get(
-                        pk=pk
+                    # Se vuelve a comprobar la propiedad de la venta
+                    # dentro de la transacción.
+                    venta = get_object_or_404(
+                        ventas_visibles_para(request.user)
+                        .select_for_update(),
+                        pk=pk,
                     )
 
                     if venta.estado != Venta.Estado.BORRADOR:
@@ -258,8 +284,9 @@ def detalle_venta(request, pk):
 @require_POST
 def confirmar_venta_view(request, pk):
 
+    # El vendedor solamente puede confirmar sus propias ventas.
     venta = get_object_or_404(
-        Venta,
+        ventas_visibles_para(request.user),
         pk=pk,
     )
 
@@ -356,8 +383,9 @@ def anular_venta_view(request, pk):
 @todos_los_cargos
 def ver_comprobante(request, pk):
 
+    # Evita consultar comprobantes de ventas ajenas.
     venta = get_object_or_404(
-        Venta.objects.select_related("usuario"),
+        ventas_visibles_para(request.user).select_related("usuario"),
         pk=pk,
     )
 

@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -7,200 +8,378 @@
 
     <title>Licorería Homero | Inicio</title>
 
+    <meta name="description" content="Descubre los productos de Licorería Homero y realiza tus pedidos de manera fácil y rápida.">
+
     <style>
+        :root {
+            --guinda: #701e32;
+            --guinda-oscuro: #351421;
+            --guinda-profundo: #251019;
+            --dorado: #d4af37;
+            --dorado-claro: #ebcf75;
+            --fondo: #faf8f7;
+            --blanco: #ffffff;
+            --texto: #30272a;
+            --texto-suave: #81777b;
+            --borde: #eee6e8;
+            --verde: #27834b;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: #faf8f7;
-            color: #30272a;
+            background: var(--fondo);
+            color: var(--texto);
+            overflow-x: hidden;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
         }
 
         /* NAVEGACIÓN */
 
         .navbar {
-            background: #701e32;
+            min-height: 76px;
+            padding: 15px 7%;
+            background: var(--guinda);
             color: white;
-            padding: 18px 7%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: space-between;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 3px 15px rgba(0,0,0,.12);
         }
 
         .brand {
-            font-size: 23px;
-            font-weight: bold;
-            letter-spacing: .5px;
+            color: white;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -.5px;
+            white-space: nowrap;
         }
 
         .brand span {
-            color: #d4af37;
+            color: var(--dorado);
         }
 
-        .navbar a {
+        .navbar nav {
+            display: flex;
+            align-items: center;
+            gap: 27px;
+        }
+
+        .navbar nav a {
             color: white;
-            text-decoration: none;
             font-size: 14px;
-            margin-left: 22px;
             font-weight: 600;
+            transition: color .2s;
         }
 
-        .navbar a:hover {
-            color: #d4af37;
+        .navbar nav a:hover {
+            color: var(--dorado);
+        }
+
+        .nav-cart {
+            border: 1px solid rgba(255,255,255,.35);
+            padding: 10px 15px;
+            border-radius: 8px;
         }
 
         /* PORTADA */
 
         .hero {
-            min-height: 480px;
-            padding: 80px 8%;
-            display: flex;
+            position: relative;
+            overflow: hidden;
+            min-height: 550px;
+            padding: 75px 8%;
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
             align-items: center;
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(45, 12, 24, .96),
-                    rgba(80, 20, 40, .83)
-                );
+            gap: 45px;
             color: white;
+            background:
+                radial-gradient(
+                    circle at 85% 45%,
+                    rgba(212,175,55,.17),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    115deg,
+                    var(--guinda-profundo),
+                    #562033 65%,
+                    #713449
+                );
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border: 1px solid rgba(212,175,55,.13);
+            border-radius: 50%;
+            right: -140px;
+            top: -170px;
         }
 
         .hero-content {
-            max-width: 650px;
+            max-width: 700px;
+            position: relative;
+            z-index: 2;
+            animation: aparecer .8s ease;
         }
 
         .hero-label {
-            color: #d4af37;
-            font-size: 13px;
-            font-weight: bold;
+            display: inline-block;
+            color: var(--dorado);
+            font-size: 12px;
+            font-weight: 800;
             letter-spacing: 3px;
-            margin-bottom: 20px;
+            margin-bottom: 23px;
         }
 
         .hero h1 {
-            font-size: clamp(36px, 5vw, 58px);
-            line-height: 1.15;
-            margin-bottom: 20px;
+            font-size: clamp(38px, 5vw, 65px);
+            line-height: 1.09;
+            letter-spacing: -2px;
+            margin-bottom: 23px;
         }
 
         .hero h1 span {
-            color: #d4af37;
+            color: var(--dorado);
         }
 
         .hero p {
+            max-width: 580px;
             color: #e7dce0;
             font-size: 17px;
             line-height: 1.8;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
         }
 
         .hero-button {
             display: inline-block;
-            background: #d4af37;
+            background: var(--dorado);
             color: #351421;
-            text-decoration: none;
-            padding: 15px 27px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: .2s;
+            padding: 16px 27px;
+            border-radius: 9px;
+            font-weight: 800;
+            transition: .25s;
         }
 
         .hero-button:hover {
-            background: #e8c957;
-            transform: translateY(-2px);
+            background: var(--dorado-claro);
+            transform: translateY(-3px);
+            box-shadow: 0 9px 22px rgba(0,0,0,.2);
+        }
+
+        .hero-secondary {
+            color: white;
+            border: 1px solid rgba(255,255,255,.4);
+            padding: 15px 23px;
+            border-radius: 9px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .hero-secondary:hover {
+            border-color: var(--dorado);
+            color: var(--dorado);
+        }
+
+        /* PANEL DECORATIVO */
+
+        .hero-visual {
+            min-height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .visual-circle {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 1px solid rgba(212,175,55,.35);
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(212,175,55,.15),
+                    rgba(255,255,255,.025) 65%,
+                    transparent 66%
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .visual-circle::before,
+        .visual-circle::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(212,175,55,.17);
+        }
+
+        .visual-circle::before {
+            inset: 22px;
+        }
+
+        .visual-circle::after {
+            inset: 45px;
+        }
+
+        .visual-bottle {
+            font-size: 125px;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 15px 18px rgba(0,0,0,.35));
+            animation: flotar 4s ease-in-out infinite;
+        }
+
+        .visual-caption {
+            position: absolute;
+            bottom: 12px;
+            background: rgba(37,16,25,.8);
+            border: 1px solid rgba(212,175,55,.4);
+            color: var(--dorado-claro);
+            padding: 11px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            z-index: 3;
         }
 
         /* CARACTERÍSTICAS */
 
         .features {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0,1fr));
             gap: 20px;
             padding: 55px 7%;
         }
 
         .feature {
-            background: white;
-            border: 1px solid #eee6e8;
-            padding: 28px;
-            border-radius: 13px;
+            background: var(--blanco);
+            border: 1px solid var(--borde);
+            padding: 29px 23px;
+            border-radius: 14px;
             text-align: center;
+            transition: .25s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(0,0,0,.055);
         }
 
         .feature-icon {
-            font-size: 32px;
-            margin-bottom: 15px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 17px;
+            border-radius: 16px;
+            background: #f8edf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
         }
 
         .feature h3 {
-            color: #701e32;
+            color: var(--guinda);
             margin-bottom: 10px;
             font-size: 17px;
         }
 
         .feature p {
-            color: #81777b;
+            color: var(--texto-suave);
             font-size: 13px;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        /* CATÁLOGO */
+        /* SECCIONES */
 
-        .products-section {
-            padding: 65px 7%;
+        .section-heading {
             text-align: center;
-            background: #fff;
+            margin-bottom: 38px;
         }
 
         .section-label {
             color: #a47a2b;
             font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 2px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
             margin-bottom: 12px;
         }
 
-        .products-section h2 {
-            font-size: 32px;
-            color: #701e32;
-            margin-bottom: 15px;
+        .section-heading h2 {
+            font-size: clamp(26px, 4vw, 36px);
+            color: var(--guinda);
+            margin-bottom: 13px;
         }
 
-        .products-description {
-            color: #81777b;
-            font-size: 15px;
-            margin-bottom: 35px;
+        .section-heading p {
+            color: var(--texto-suave);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* PRODUCTOS */
+
+        .products-section {
+            padding: 70px 7%;
+            background: white;
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0,1fr));
             gap: 22px;
-            text-align: left;
         }
 
         .product-card {
-            background: #fff;
-            border: 1px solid #eee6e8;
-            border-radius: 13px;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 14px;
             overflow: hidden;
-            transition: transform .2s, box-shadow .2s;
+            transition: transform .25s, box-shadow .25s;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(0,0,0,.09);
         }
 
         .product-image {
             height: 230px;
-            background: #f5f1f2;
+            background: #f7f3f4;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -211,7 +390,12 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            padding: 12px;
+            padding: 15px;
+            transition: transform .3s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.06);
         }
 
         .product-placeholder {
@@ -220,80 +404,141 @@
         }
 
         .product-info {
-            padding: 18px;
+            padding: 19px;
         }
 
         .product-category {
             color: #a47a2b;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: .8px;
         }
 
         .product-info h3 {
-            color: #30272a;
-            font-size: 16px;
-            margin: 9px 0;
-            min-height: 38px;
+            color: var(--texto);
+            font-size: 15px;
+            line-height: 1.4;
+            margin: 10px 0;
+            min-height: 42px;
         }
 
         .product-brand {
-            color: #81777b;
-            font-size: 13px;
-            margin-bottom: 14px;
+            color: var(--texto-suave);
+            font-size: 12px;
+            margin-bottom: 15px;
         }
 
         .product-price {
-            color: #701e32;
+            color: var(--guinda);
             font-size: 21px;
-            font-weight: bold;
+            font-weight: 800;
         }
 
         .product-stock {
             display: inline-block;
-            margin-top: 12px;
-            padding: 6px 10px;
+            margin-top: 13px;
+            padding: 7px 11px;
             border-radius: 20px;
             background: #e8f5ec;
-            color: #27834b;
+            color: var(--verde);
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 800;
         }
 
         .products-empty {
             grid-column: 1 / -1;
             padding: 45px 20px;
-            background: #faf8f7;
+            background: var(--fondo);
             border: 1px dashed #d9cbd0;
             border-radius: 12px;
-            color: #81777b;
+            color: var(--texto-suave);
             text-align: center;
+        }
+
+        .catalog-more {
+            text-align: center;
+            margin-top: 38px;
+        }
+
+        .catalog-button {
+            display: inline-block;
+            background: var(--guinda);
+            color: white;
+            padding: 14px 25px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 800;
+            transition: .2s;
+        }
+
+        .catalog-button:hover {
+            background: #8c2942;
+            transform: translateY(-2px);
         }
 
         /* CATEGORÍAS */
 
         .categories-section {
-            padding: 55px 7%;
+            padding: 65px 7%;
             text-align: center;
+            background: var(--fondo);
         }
 
         .categories-list {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 25px;
+            gap: 13px;
+            margin-top: 28px;
         }
 
         .category-item {
+            display: inline-block;
             background: white;
-            color: #701e32;
+            color: var(--guinda);
             border: 1px solid #eadde1;
-            border-radius: 25px;
-            padding: 11px 20px;
+            border-radius: 30px;
+            padding: 12px 21px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .category-item:hover {
+            background: var(--guinda);
+            color: white;
+            border-color: var(--guinda);
+            transform: translateY(-2px);
+        }
+
+        /* LLAMADA A LA ACCIÓN */
+
+        .cta-section {
+            padding: 55px 7%;
+            background: white;
+        }
+
+        .cta-card {
+            max-width: 1100px;
+            margin: auto;
+            padding: 42px 35px;
+            border-radius: 18px;
+            text-align: center;
+            color: white;
+            background: linear-gradient(110deg, #351421, #701e32);
+        }
+
+        .cta-card h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .cta-card p {
+            color: #e7dce0;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 23px;
         }
 
         /* PIE DE PÁGINA */
@@ -301,55 +546,223 @@
         .footer {
             background: #27151c;
             color: #e9dfe3;
-            padding: 35px 7%;
+            padding: 45px 7% 25px;
             text-align: center;
         }
 
         .footer h3 {
-            color: #d4af37;
-            margin-bottom: 10px;
+            color: var(--dorado);
+            font-size: 22px;
+            margin-bottom: 12px;
         }
 
         .footer p {
             font-size: 13px;
             color: #c5b9bf;
-            line-height: 1.8;
+            line-height: 1.9;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 22px;
+            margin: 22px 0;
+        }
+
+        .footer-links a {
+            color: #e9dfe3;
+            font-size: 13px;
+        }
+
+        .footer-links a:hover {
+            color: var(--dorado);
         }
 
         .footer-bottom {
-            margin-top: 22px;
-            padding-top: 18px;
+            margin-top: 25px;
+            padding-top: 19px;
             border-top: 1px solid #49343d;
             font-size: 12px;
             color: #a99ba2;
         }
 
-        /* RESPONSIVE */
+        /* VERIFICACIÓN DE EDAD */
 
-        @media (max-width: 1000px) {
-            .products-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
+        .age-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(20,8,13,.91);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(7px);
+        }
+
+        .age-modal {
+            width: 100%;
+            max-width: 440px;
+            background: white;
+            border-radius: 18px;
+            padding: 36px 30px;
+            text-align: center;
+            box-shadow: 0 25px 70px rgba(0,0,0,.35);
+            animation: aparecer .35s ease;
+        }
+
+        .age-icon {
+            width: 66px;
+            height: 66px;
+            margin: 0 auto 19px;
+            background: #f8edf0;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .age-modal h2 {
+            color: var(--guinda);
+            font-size: 24px;
+            margin-bottom: 13px;
+        }
+
+        .age-modal p {
+            color: #71676c;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+        .age-question {
+            font-weight: 800;
+            color: var(--texto) !important;
+        }
+
+        .age-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+        }
+
+        .age-button {
+            border: none;
+            border-radius: 9px;
+            padding: 14px 10px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .age-yes {
+            background: var(--guinda);
+            color: white;
+        }
+
+        .age-yes:hover {
+            background: #8c2942;
+        }
+
+        .age-no {
+            background: #f0edef;
+            color: #51474c;
+        }
+
+        .age-no:hover {
+            background: #e5dfe2;
+        }
+
+        .age-warning {
+            display: none;
+            margin-top: 18px;
+            padding: 13px;
+            border-radius: 9px;
+            background: #fff0f0;
+            color: #a42e2e;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* ANIMACIONES */
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        @media (max-width: 750px) {
-            .navbar {
-                justify-content: center;
-                text-align: center;
+        @keyframes flotar {
+            0%, 100% {
+                transform: translateY(0);
             }
-
-            .navbar nav {
-                width: 100%;
+            50% {
+                transform: translateY(-12px);
             }
+        }
 
-            .navbar a {
-                display: inline-block;
-                margin: 8px;
+        /* RESPONSIVE */
+
+        @media (max-width: 1050px) {
+            .products-grid {
+                grid-template-columns: repeat(3, minmax(0,1fr));
             }
 
             .hero {
-                min-height: 400px;
+                grid-template-columns: 1fr .7fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                padding: 17px 5%;
+            }
+
+            .navbar nav {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
                 padding: 65px 7%;
+            }
+
+            .hero-content {
+                margin: auto;
+            }
+
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                min-height: 270px;
+            }
+
+            .visual-circle {
+                width: 250px;
+                height: 250px;
+            }
+
+            .visual-bottle {
+                font-size: 95px;
             }
 
             .features {
@@ -357,215 +770,430 @@
             }
 
             .products-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .products-section h2 {
-                font-size: 26px;
-            }
-
-            .product-image {
-                height: 180px;
+                grid-template-columns: repeat(2, minmax(0,1fr));
             }
         }
 
-        @media (max-width: 420px) {
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 21px;
+            }
+
+            .navbar nav {
+                gap: 12px;
+            }
+
+            .navbar nav a {
+                font-size: 12px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .hero-button,
+            .hero-secondary {
+                text-align: center;
+            }
+
+            .products-section,
+            .categories-section {
+                padding: 50px 5%;
+            }
+
             .products-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 220px;
+            }
+
+            .cta-card {
+                padding: 32px 20px;
+            }
+
+            .age-modal {
+                padding: 29px 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
             }
         }
     </style>
 </head>
 
-<body>
+<body class="modal-open">
+
+    <!-- VERIFICACIÓN DE MAYORÍA DE EDAD -->
+
+    <div class="age-overlay" id="ageOverlay">
+
+        <div class="age-modal">
+
+            <div class="age-icon">🔞</div>
+
+            <h2>Bienvenido a Licorería Homero</h2>
+
+            <p>
+                Este sitio contiene información sobre bebidas alcohólicas.
+                Para continuar, debes tener la mayoría de edad legal.
+            </p>
+
+            <p class="age-question">
+                ¿Tienes 18 años o más?
+            </p>
+
+            <div class="age-actions">
+
+                <button
+                    type="button"
+                    class="age-button age-yes"
+                    id="ageYes"
+                >
+                    Sí, soy mayor de edad
+                </button>
+
+                <button
+                    type="button"
+                    class="age-button age-no"
+                    id="ageNo"
+                >
+                    No
+                </button>
+
+            </div>
+
+            <div class="age-warning" id="ageWarning">
+                No puedes acceder a este sitio si eres menor de edad.
+            </div>
+
+        </div>
+
+    </div>
+
 
     <!-- NAVEGACIÓN -->
+
     <header class="navbar">
 
-        <div class="brand">
+        <a href="{% url 'publico:inicio' %}" class="brand">
             Licorería <span>Homero</span>
-        </div>
+        </a>
 
         <nav>
             <a href="{% url 'publico:inicio' %}">Inicio</a>
-            <a href="#productos">Productos</a>
+            <a href="{% url 'publico:catalogo' %}">Productos</a>
             <a href="#categorias">Categorías</a>
             <a href="#nosotros">Nosotros</a>
             <a href="#contacto">Contacto</a>
+            <a href="{% url 'publico:carrito' %}" class="nav-cart">
+                🛒 Carrito
+            </a>
         </nav>
 
     </header>
 
 
-    <!-- PORTADA -->
-    <section class="hero">
+    <!-- PORTADA PRINCIPAL -->
 
-        <div class="hero-content">
+    <main>
 
-            <div class="hero-label">
-                BIENVENIDO A LICORERÍA HOMERO
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-label">
+                    BIENVENIDO A LICORERÍA HOMERO
+                </div>
+
+                <h1>
+                    Encuentra tus bebidas favoritas
+                    <span>en un solo lugar.</span>
+                </h1>
+
+                <p>
+                    Descubre nuestra variedad de bebidas y productos.
+                    Explora nuestro catálogo y realiza tus pedidos
+                    de manera fácil, rápida y cómoda.
+                </p>
+
+                <div class="hero-actions">
+
+                    <a
+                        href="{% url 'publico:catalogo' %}"
+                        class="hero-button"
+                    >
+                        Explorar productos
+                    </a>
+
+                    <a href="#nosotros" class="hero-secondary">
+                        Conócenos
+                    </a>
+
+                </div>
+
             </div>
 
-            <h1>
-                Encuentra tus bebidas favoritas en un solo lugar.
-            </h1>
 
-            <p>
-                Descubre nuestra variedad de bebidas, conoce nuestros
-                productos y realiza tus pedidos de manera fácil y rápida.
-            </p>
+            <div class="hero-visual">
 
-            <a href="#productos" class="hero-button">
-                Explorar productos
-            </a>
-
-        </div>
-
-    </section>
-
-
-    <!-- CARACTERÍSTICAS -->
-    <section class="features" id="nosotros">
-
-        <div class="feature">
-            <div class="feature-icon">🍷</div>
-
-            <h3>Variedad de productos</h3>
-
-            <p>
-                Encuentra diferentes bebidas y productos
-                disponibles en nuestra licorería.
-            </p>
-        </div>
-
-        <div class="feature">
-            <div class="feature-icon">🛒</div>
-
-            <h3>Pedidos sencillos</h3>
-
-            <p>
-                Selecciona tus productos y realiza tu pedido
-                de forma rápida y sencilla.
-            </p>
-        </div>
-
-        <div class="feature">
-            <div class="feature-icon">⭐</div>
-
-            <h3>Atención al cliente</h3>
-
-            <p>
-                Estamos para ayudarte y brindarte
-                una buena experiencia de compra.
-            </p>
-        </div>
-
-    </section>
-
-
-    <!-- CATÁLOGO DE PRODUCTOS -->
-    <section class="products-section" id="productos">
-
-        <div class="section-label">
-            NUESTRO CATÁLOGO
-        </div>
-
-        <h2>Descubre nuestros productos</h2>
-
-        <p class="products-description">
-            Conoce nuestra selección de bebidas disponibles.
-        </p>
-
-        <div class="products-grid">
-
-            {% for producto in productos %}
-
-            <article class="product-card">
-
-                <div class="product-image">
-
-                    {% if producto.imagen %}
-                        <img
-                            src="{{ producto.imagen.url }}"
-                            alt="{{ producto.nombre }}"
-                        >
-                    {% else %}
-                        <div class="product-placeholder">🍾</div>
-                    {% endif %}
-
+                <div class="visual-circle">
+                    <div class="visual-bottle">🍾</div>
                 </div>
 
-                <div class="product-info">
-
-                    <span class="product-category">
-                        {{ producto.categoria.nombre }}
-                    </span>
-
-                    <h3>{{ producto.nombre }}</h3>
-
-                    <p class="product-brand">
-                        {% if producto.marca %}
-                            {{ producto.marca.nombre }}
-                        {% else %}
-                            Sin marca
-                        {% endif %}
-                    </p>
-
-                    <div class="product-price">
-                        Bs {{ producto.precio_venta|floatformat:2 }}
-                    </div>
-
-                    <span class="product-stock">
-                        Disponible
-                    </span>
-
+                <div class="visual-caption">
+                    VARIEDAD Y ATENCIÓN
                 </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CARACTERÍSTICAS -->
+
+        <section class="features" id="nosotros">
+
+            <article class="feature">
+
+                <div class="feature-icon">🍷</div>
+
+                <h3>Variedad de productos</h3>
+
+                <p>
+                    Encuentra diferentes bebidas y productos
+                    disponibles en nuestra licorería.
+                </p>
 
             </article>
 
-            {% empty %}
 
-            <div class="products-empty">
-                <h3>Aún no tenemos productos disponibles</h3>
-                <p>Pronto encontrarás aquí nuestro catálogo de bebidas.</p>
+            <article class="feature">
+
+                <div class="feature-icon">🛒</div>
+
+                <h3>Pedidos sencillos</h3>
+
+                <p>
+                    Selecciona tus productos y realiza tu pedido
+                    de forma rápida y sencilla.
+                </p>
+
+            </article>
+
+
+            <article class="feature">
+
+                <div class="feature-icon">⭐</div>
+
+                <h3>Atención al cliente</h3>
+
+                <p>
+                    Estamos para ayudarte y brindarte
+                    una buena experiencia de compra.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <!-- CATÁLOGO DE PRODUCTOS -->
+
+        <section class="products-section" id="productos">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    NUESTRO CATÁLOGO
+                </div>
+
+                <h2>Descubre nuestros productos</h2>
+
+                <p>
+                    Conoce nuestra selección de productos disponibles
+                    en Licorería Homero.
+                </p>
+
             </div>
 
-            {% endfor %}
 
-        </div>
+            <div class="products-grid">
 
-    </section>
+                {% for producto in productos %}
+
+                    <article class="product-card">
+
+                        <div class="product-image">
+
+                            {% if producto.imagen %}
+
+                                <img
+                                    src="{{ producto.imagen.url }}"
+                                    alt="{{ producto.nombre }}"
+                                    loading="lazy"
+                                >
+
+                            {% else %}
+
+                                <div class="product-placeholder">
+                                    🍾
+                                </div>
+
+                            {% endif %}
+
+                        </div>
 
 
-    <!-- CATEGORÍAS -->
-    <section class="categories-section" id="categorias">
+                        <div class="product-info">
 
-        <div class="section-label">
-            EXPLORA
-        </div>
+                            <span class="product-category">
+                                {{ producto.categoria.nombre }}
+                            </span>
 
-        <h2>Categorías de productos</h2>
+                            <h3>{{ producto.nombre }}</h3>
 
-        <div class="categories-list">
+                            <p class="product-brand">
 
-            {% for categoria in categorias %}
+                                {% if producto.marca %}
+                                    {{ producto.marca.nombre }}
+                                {% else %}
+                                    Sin marca
+                                {% endif %}
 
-                <span class="category-item">
-                    {{ categoria.nombre }}
-                </span>
+                            </p>
 
-            {% empty %}
+                            <div class="product-price">
+                                Bs {{ producto.precio_venta|floatformat:2 }}
+                            </div>
 
-                <p>No hay categorías disponibles.</p>
+                            <span class="product-stock">
+                                Disponible
+                            </span>
 
-            {% endfor %}
+                        </div>
 
-        </div>
+                    </article>
 
-    </section>
+                {% empty %}
+
+                    <div class="products-empty">
+
+                        <h3>Aún no tenemos productos disponibles</h3>
+
+                        <p>
+                            Pronto encontrarás aquí nuestro catálogo.
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="catalog-more">
+
+                <a
+                    href="{% url 'publico:catalogo' %}"
+                    class="catalog-button"
+                >
+                    Ver catálogo completo →
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- CATEGORÍAS -->
+
+        <section class="categories-section" id="categorias">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    EXPLORA
+                </div>
+
+                <h2>Categorías de productos</h2>
+
+                <p>
+                    Descubre los diferentes tipos de productos
+                    que tenemos disponibles.
+                </p>
+
+            </div>
+
+
+            <div class="categories-list">
+
+                {% for categoria in categorias %}
+
+                    <a
+                        href="{% url 'publico:catalogo' %}"
+                        class="category-item"
+                    >
+                        {{ categoria.nombre }}
+                    </a>
+
+                {% empty %}
+
+                    <p>No hay categorías disponibles.</p>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- LLAMADA A LA ACCIÓN -->
+
+        <section class="cta-section">
+
+            <div class="cta-card">
+
+                <h2>¿Ya encontraste lo que buscas?</h2>
+
+                <p>
+                    Explora nuestro catálogo y selecciona
+                    los productos que deseas solicitar.
+                </p>
+
+                <a
+                    href="{% url 'publico:catalogo' %}"
+                    class="hero-button"
+                >
+                    Ir al catálogo
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
 
 
     <!-- PIE DE PÁGINA -->
+
     <footer class="footer" id="contacto">
 
         <h3>Licorería Homero</h3>
@@ -578,11 +1206,91 @@
             Vallegrande - Santa Cruz, Bolivia
         </p>
 
+        <div class="footer-links">
+
+            <a href="{% url 'publico:inicio' %}">
+                Inicio
+            </a>
+
+            <a href="{% url 'publico:catalogo' %}">
+                Productos
+            </a>
+
+            <a href="{% url 'publico:carrito' %}">
+                Carrito
+            </a>
+
+        </div>
+
         <div class="footer-bottom">
             © 2026 Licorería Homero. Todos los derechos reservados.
         </div>
 
     </footer>
+
+
+    <!-- FUNCIONAMIENTO DE LA VERIFICACIÓN DE EDAD -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const overlay = document.getElementById("ageOverlay");
+            const yesButton = document.getElementById("ageYes");
+            const noButton = document.getElementById("ageNo");
+            const warning = document.getElementById("ageWarning");
+
+            const AGE_KEY = "licoreria_homero_mayor_edad";
+
+            function cerrarModal() {
+                overlay.style.display = "none";
+                document.body.classList.remove("modal-open");
+            }
+
+            function mostrarModal() {
+                overlay.style.display = "flex";
+                document.body.classList.add("modal-open");
+            }
+
+            // Comprobar si el visitante ya confirmó su mayoría de edad.
+            try {
+                if (sessionStorage.getItem(AGE_KEY) === "confirmado") {
+                    cerrarModal();
+                } else {
+                    mostrarModal();
+                }
+            } catch (error) {
+                mostrarModal();
+            }
+
+            // Confirmación de mayoría de edad.
+            yesButton.addEventListener("click", function () {
+
+                try {
+                    sessionStorage.setItem(AGE_KEY, "confirmado");
+                } catch (error) {
+                    // Si el navegador no permite almacenamiento,
+                    // se mantiene la navegación en esta sesión.
+                }
+
+                cerrarModal();
+
+            });
+
+            // Rechazo de acceso.
+            noButton.addEventListener("click", function () {
+
+                warning.style.display = "block";
+
+                yesButton.disabled = true;
+                noButton.disabled = true;
+
+                yesButton.style.opacity = ".45";
+                noButton.style.opacity = ".45";
+
+            });
+
+        });
+    </script>
 
 </body>
 </html>

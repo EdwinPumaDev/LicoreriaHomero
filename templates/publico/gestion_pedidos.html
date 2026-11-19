@@ -1,0 +1,831 @@
+
+{% extends "base.html" %}
+
+{% block title %}Pedidos recibidos | Licorería Homero{% endblock %}
+
+{% block breadcrumb %}
+    LICORERÍA HOMERO / PEDIDOS RECIBIDOS
+{% endblock %}
+
+{% block page_title %}
+    Pedidos recibidos
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pedidos-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .pedidos-intro {
+        color: var(--text-muted, #7b7b7b);
+        font-size: 14px;
+        margin-top: -10px;
+    }
+
+    .estadisticas-pedidos {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .estadistica-pedido {
+        background: var(--card-bg, white);
+        border: 1px solid var(--border-color, #eee6e8);
+        border-radius: 13px;
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.03);
+    }
+
+    .estadistica-icono {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        background: #f7e9ed;
+        color: #701e32;
+        flex-shrink: 0;
+    }
+
+    .estadistica-pedido:nth-child(2) .estadistica-icono {
+        background: #fff2df;
+        color: #b7791f;
+    }
+
+    .estadistica-pedido:nth-child(3) .estadistica-icono {
+        background: #e7f5ec;
+        color: #27834b;
+    }
+
+    .estadistica-pedido:nth-child(4) .estadistica-icono {
+        background: #fbe9e9;
+        color: #b83232;
+    }
+
+    .estadistica-info small {
+        display: block;
+        color: var(--text-muted, #777);
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .estadistica-info strong {
+        font-size: 25px;
+        color: var(--text-color, #30272a);
+    }
+
+    .pedidos-panel {
+        background: var(--card-bg, white);
+        border: 1px solid var(--border-color, #eee6e8);
+        border-radius: 13px;
+        overflow: hidden;
+    }
+
+    .panel-heading {
+        padding: 22px 24px;
+        border-bottom: 1px solid var(--border-color, #eee6e8);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .panel-heading h2 {
+        color: var(--text-color, #30272a);
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .panel-heading p {
+        color: var(--text-muted, #777);
+        font-size: 13px;
+    }
+
+    .contador-pedidos {
+        background: #f5edf0;
+        color: #701e32;
+        padding: 8px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .tabla-contenedor {
+        overflow-x: auto;
+    }
+
+    .tabla-pedidos {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+    .tabla-pedidos th {
+        background: var(--table-header-bg, #faf8f7);
+        color: var(--text-muted, #777);
+        padding: 15px 18px;
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .tabla-pedidos td {
+        padding: 17px 18px;
+        border-top: 1px solid var(--border-color, #eee6e8);
+        font-size: 13px;
+        color: var(--text-color, #30272a);
+    }
+
+    .tabla-pedidos tbody tr:hover {
+        background: var(--hover-bg, #faf7f8);
+    }
+
+    .numero-pedido {
+        color: #701e32;
+        font-weight: bold;
+    }
+
+    .cliente-nombre {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .cliente-telefono {
+        color: var(--text-muted, #777);
+        font-size: 12px;
+    }
+
+    .precio-pedido {
+        font-weight: bold;
+        color: #701e32;
+        white-space: nowrap;
+    }
+
+    .estado-pedido {
+        display: inline-block;
+        padding: 7px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .estado-pendiente {
+        background: #fff3d9;
+        color: #946c1c;
+    }
+
+    .estado-aceptado {
+        background: #e5f5eb;
+        color: #27834b;
+    }
+
+    .estado-rechazado {
+        background: #fbe9e9;
+        color: #b83232;
+    }
+
+    .boton-detalle {
+        display: inline-block;
+        background: #f5edf0;
+        color: #701e32;
+        padding: 9px 13px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 12px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .boton-detalle:hover {
+        background: #ead8de;
+    }
+
+    .detalle-fila {
+        display: none;
+        background: var(--hover-bg, #faf8f7);
+    }
+
+    .detalle-fila.mostrar {
+        display: table-row;
+    }
+
+    .detalle-contenido {
+        padding: 20px;
+    }
+
+    .detalle-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .detalle-bloque h4 {
+        color: #701e32;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .detalle-bloque p {
+        font-size: 13px;
+        margin-bottom: 9px;
+        color: var(--text-color, #30272a);
+    }
+
+    .detalle-productos {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .detalle-productos th,
+    .detalle-productos td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color, #eee6e8);
+    }
+
+    .detalle-productos th {
+        background: transparent;
+        color: var(--text-muted, #777);
+    }
+
+    /* Acciones de pedidos */
+
+    .acciones-pedido {
+        margin-top: 25px;
+        padding: 20px;
+        border: 1px solid var(--border-color, #eee6e8);
+        border-radius: 12px;
+        background: var(--card-bg, white);
+    }
+
+    .acciones-pedido h4 {
+        color: var(--text-color, #30272a);
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .acciones-pedido > p {
+        color: var(--text-muted, #777);
+        font-size: 12px;
+        margin-bottom: 17px;
+    }
+
+    .acciones-formulario {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .campo-metodo {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 220px;
+        flex: 1;
+    }
+
+    .campo-metodo label {
+        font-size: 12px;
+        font-weight: bold;
+        color: var(--text-color, #30272a);
+    }
+
+    .select-pago {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid var(--border-color, #ddd);
+        border-radius: 8px;
+        background: var(--card-bg, white);
+        color: var(--text-color, #30272a);
+        font-size: 13px;
+        outline: none;
+    }
+
+    .select-pago:focus {
+        border-color: #701e32;
+    }
+
+    .boton-aceptar,
+    .boton-rechazar {
+        border: none;
+        border-radius: 8px;
+        padding: 12px 17px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .boton-aceptar {
+        background: #27834b;
+        color: white;
+    }
+
+    .boton-aceptar:hover {
+        background: #1e693b;
+    }
+
+    .boton-rechazar {
+        background: #fbe9e9;
+        color: #b83232;
+    }
+
+    .boton-rechazar:hover {
+        background: #f4d4d4;
+    }
+
+    .venta-generada {
+        margin-top: 18px;
+        padding: 13px 15px;
+        border-radius: 8px;
+        background: #e5f5eb;
+        color: #27834b;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .pedido-rechazado-aviso {
+        margin-top: 18px;
+        padding: 13px 15px;
+        border-radius: 8px;
+        background: #fbe9e9;
+        color: #b83232;
+        font-size: 13px;
+    }
+
+    .sin-pedidos {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .sin-pedidos-icono {
+        font-size: 50px;
+        margin-bottom: 15px;
+    }
+
+    .sin-pedidos h3 {
+        color: #701e32;
+        font-size: 19px;
+        margin-bottom: 8px;
+    }
+
+    .sin-pedidos p {
+        color: var(--text-muted, #777);
+        font-size: 13px;
+    }
+
+    @media (max-width: 1000px) {
+        .estadisticas-pedidos {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .estadisticas-pedidos {
+            grid-template-columns: 1fr;
+        }
+
+        .detalle-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .acciones-formulario {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .campo-metodo {
+            min-width: 100%;
+        }
+
+        .boton-aceptar,
+        .boton-rechazar {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="pedidos-container">
+
+    <p class="pedidos-intro">
+        Consulta y revisa los pedidos realizados por los clientes desde el sitio público.
+    </p>
+
+    <!-- ESTADÍSTICAS -->
+
+    <section class="estadisticas-pedidos">
+
+        <article class="estadistica-pedido">
+            <div class="estadistica-icono">▤</div>
+            <div class="estadistica-info">
+                <small>Total de pedidos</small>
+                <strong>{{ total_pedidos }}</strong>
+            </div>
+        </article>
+
+        <article class="estadistica-pedido">
+            <div class="estadistica-icono">◷</div>
+            <div class="estadistica-info">
+                <small>Pendientes</small>
+                <strong>{{ pedidos_pendientes }}</strong>
+            </div>
+        </article>
+
+        <article class="estadistica-pedido">
+            <div class="estadistica-icono">✓</div>
+            <div class="estadistica-info">
+                <small>Aceptados</small>
+                <strong>{{ pedidos_aceptados }}</strong>
+            </div>
+        </article>
+
+        <article class="estadistica-pedido">
+            <div class="estadistica-icono">✕</div>
+            <div class="estadistica-info">
+                <small>Rechazados</small>
+                <strong>{{ pedidos_rechazados }}</strong>
+            </div>
+        </article>
+
+    </section>
+
+
+    <!-- TABLA DE PEDIDOS -->
+
+    <section class="pedidos-panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <h2>Listado de pedidos</h2>
+                <p>Pedidos recibidos desde la página pública.</p>
+            </div>
+
+            <span class="contador-pedidos">
+                {{ total_pedidos }} registros
+            </span>
+
+        </div>
+
+        <div class="tabla-contenedor">
+
+            <table class="tabla-pedidos">
+
+                <thead>
+                    <tr>
+                        <th>N.º pedido</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for pedido in pedidos %}
+
+                        <tr>
+
+                            <td>
+                                <span class="numero-pedido">
+                                    #{{ pedido.id }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="cliente-nombre">
+                                    {{ pedido.nombre_cliente }}
+                                </div>
+
+                                <div class="cliente-telefono">
+                                    {{ pedido.telefono }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ pedido.creado_en|date:"d/m/Y H:i" }}
+                            </td>
+
+                            <td>
+                                <span class="precio-pedido">
+                                    Bs {{ pedido.total|floatformat:2 }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if pedido.estado == "PENDIENTE" %}
+                                    <span class="estado-pedido estado-pendiente">
+                                        Pendiente
+                                    </span>
+                                {% elif pedido.estado == "ACEPTADO" %}
+                                    <span class="estado-pedido estado-aceptado">
+                                        Aceptado
+                                    </span>
+                                {% else %}
+                                    <span class="estado-pedido estado-rechazado">
+                                        Rechazado
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <button
+                                    type="button"
+                                    class="boton-detalle"
+                                    onclick="mostrarDetalle('detalle-{{ pedido.id }}', this)"
+                                >
+                                    Ver detalles
+                                </button>
+                            </td>
+
+                        </tr>
+
+
+                        <!-- DETALLES DEL PEDIDO -->
+
+                        <tr
+                            class="detalle-fila"
+                            id="detalle-{{ pedido.id }}"
+                        >
+
+                            <td colspan="6">
+
+                                <div class="detalle-contenido">
+
+                                    <div class="detalle-grid">
+
+                                        <div class="detalle-bloque">
+
+                                            <h4>Información del cliente</h4>
+
+                                            <p>
+                                                <strong>Nombre:</strong>
+                                                {{ pedido.nombre_cliente }}
+                                            </p>
+
+                                            <p>
+                                                <strong>Teléfono:</strong>
+                                                {{ pedido.telefono }}
+                                            </p>
+
+                                            <p>
+                                                <strong>Dirección:</strong>
+                                                {{ pedido.direccion }}
+                                            </p>
+
+                                            <p>
+                                                <strong>Observaciones:</strong>
+                                                {{ pedido.observaciones|default:"Sin observaciones" }}
+                                            </p>
+
+                                        </div>
+
+                                        <div class="detalle-bloque">
+
+                                            <h4>Productos solicitados</h4>
+
+                                            <table class="detalle-productos">
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>Producto</th>
+                                                        <th>Cantidad</th>
+                                                        <th>Precio</th>
+                                                        <th>Subtotal</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                    {% for detalle in pedido.detalles.all %}
+
+                                                        <tr>
+                                                            <td>
+                                                                {{ detalle.producto.nombre }}
+                                                            </td>
+
+                                                            <td>
+                                                                {{ detalle.cantidad }}
+                                                            </td>
+
+                                                            <td>
+                                                                Bs {{ detalle.precio_unitario|floatformat:2 }}
+                                                            </td>
+
+                                                            <td>
+                                                                Bs {{ detalle.subtotal|floatformat:2 }}
+                                                            </td>
+                                                        </tr>
+
+                                                    {% empty %}
+
+                                                        <tr>
+                                                            <td colspan="4">
+                                                                No hay productos registrados.
+                                                            </td>
+                                                        </tr>
+
+                                                    {% endfor %}
+
+                                                </tbody>
+
+                                            </table>
+
+                                            <p style="margin-top: 15px; text-align: right;">
+                                                <strong>Total:</strong>
+                                                <span class="precio-pedido">
+                                                    Bs {{ pedido.total|floatformat:2 }}
+                                                </span>
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- ACCIONES SEGÚN EL ESTADO DEL PEDIDO -->
+
+                                    {% if pedido.estado == "PENDIENTE" %}
+
+                                        <div class="acciones-pedido">
+
+                                            <h4>Gestionar pedido</h4>
+
+                                            <p>
+                                                Al aceptar el pedido se generará una venta
+                                                y se actualizará el inventario y la caja.
+                                            </p>
+
+                                            <form
+                                                method="POST"
+                                                action="{% url 'publico:aceptar_pedido' pedido.id %}"
+                                                class="acciones-formulario"
+                                            >
+
+                                                {% csrf_token %}
+
+                                                <div class="campo-metodo">
+
+                                                    <label for="metodo-{{ pedido.id }}">
+                                                        Método de pago
+                                                    </label>
+
+                                                    <select
+                                                        name="metodo_pago"
+                                                        id="metodo-{{ pedido.id }}"
+                                                        class="select-pago"
+                                                        required
+                                                    >
+                                                        <option value="">
+                                                            Seleccione un método
+                                                        </option>
+
+                                                        <option value="EFECTIVO">
+                                                            Efectivo
+                                                        </option>
+
+                                                        <option value="QR">
+                                                            QR
+                                                        </option>
+
+                                                        <option value="TARJETA">
+                                                            Tarjeta
+                                                        </option>
+
+                                                        <option value="TRANSFERENCIA">
+                                                            Transferencia
+                                                        </option>
+
+                                                        <option value="OTRO">
+                                                            Otro
+                                                        </option>
+
+                                                    </select>
+
+                                                </div>
+
+                                                <button
+                                                    type="submit"
+                                                    class="boton-aceptar"
+                                                    onclick="return confirm('¿Deseas aceptar este pedido y generar la venta?');"
+                                                >
+                                                    ✓ Aceptar pedido y generar venta
+                                                </button>
+
+                                            </form>
+
+
+                                            <form
+                                                method="POST"
+                                                action="{% url 'publico:rechazar_pedido' pedido.id %}"
+                                                style="margin-top: 13px;"
+                                                onsubmit="return confirm('¿Estás seguro de rechazar este pedido?');"
+                                            >
+
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="boton-rechazar"
+                                                >
+                                                    ✕ Rechazar pedido
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    {% elif pedido.estado == "ACEPTADO" %}
+
+                                        <div class="venta-generada">
+                                            ✓ Este pedido fue aceptado.
+                                            {% if pedido.venta %}
+                                                Venta generada: {{ pedido.venta.numero }}
+                                            {% else %}
+                                                La venta asociada no está disponible.
+                                            {% endif %}
+                                        </div>
+
+                                    {% elif pedido.estado == "RECHAZADO" %}
+
+                                        <div class="pedido-rechazado-aviso">
+                                            Este pedido fue rechazado. No se generó ninguna venta.
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="6">
+
+                                <div class="sin-pedidos">
+                                    <div class="sin-pedidos-icono">🛒</div>
+
+                                    <h3>No hay pedidos registrados</h3>
+
+                                    <p>
+                                        Cuando un cliente envíe un pedido desde
+                                        el catálogo, aparecerá aquí.
+                                    </p>
+                                </div>
+
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+    function mostrarDetalle(id, boton) {
+        const fila = document.getElementById(id);
+
+        if (!fila) {
+            return;
+        }
+
+        fila.classList.toggle("mostrar");
+
+        boton.textContent = fila.classList.contains("mostrar")
+            ? "Ocultar detalles"
+            : "Ver detalles";
+    }
+</script>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es"
@@ -64,27 +65,22 @@
             background-color: var(--color-principal);
         }
 
-        /* CORRECCIÓN DEL MENÚ LATERAL */
+        /* MENÚ LATERAL */
 
         .sidebar {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             bottom: 0 !important;
-
             width: 250px;
             height: 100vh !important;
             height: 100dvh !important;
-
             display: flex !important;
             flex-direction: column !important;
-
             overflow-x: hidden !important;
             overflow-y: auto !important;
-
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
-
             scrollbar-width: thin;
             scrollbar-color: #A59AA0 transparent;
         }
@@ -220,6 +216,15 @@
                 Ventas
             </a>
 
+            <!-- PEDIDOS RECIBIDOS -->
+            {% if request.user.is_superuser or request.user.perfil.cargo == 'ADMINISTRADOR' or request.user.perfil.cargo == 'ENCARGADO' or request.user.perfil.cargo == 'VENDEDOR' %}
+                <a class="nav-item {% if request.resolver_match.url_name == 'lista_pedidos' and request.resolver_match.app_name == 'publico' %}active{% endif %}"
+                   href="{% url 'publico:lista_pedidos' %}">
+                    <span>🛒</span>
+                    Pedidos recibidos
+                </a>
+            {% endif %}
+
             <!-- CAJA -->
             <a class="nav-item {% if request.resolver_match.app_name == 'caja' %}active{% endif %}"
                href="{% url 'caja:lista_ingresos' %}">
@@ -279,7 +284,6 @@
         <!-- PARTE INFERIOR DEL MENÚ -->
         <div class="sidebar-bottom">
 
-            <!-- CERRAR SESIÓN -->
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
 

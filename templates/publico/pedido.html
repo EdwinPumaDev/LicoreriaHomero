@@ -1,0 +1,596 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar pedido | Licorería Homero</title>
+
+    <style>
+        :root {
+            --vino: #701E32;
+            --vino-oscuro: #4B1423;
+            --dorado: #D6AD60;
+            --fondo: #FAF8F7;
+            --blanco: #FFFFFF;
+            --texto: #30272A;
+            --gris: #81777B;
+            --borde: #EEE6E8;
+            --rojo: #A12626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        /* ENCABEZADO */
+
+        header {
+            background: var(--vino-oscuro);
+            color: white;
+            padding: 19px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .marca {
+            font-size: 22px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .marca span {
+            color: var(--dorado);
+        }
+
+        header nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s;
+        }
+
+        header a:hover {
+            color: var(--dorado);
+        }
+
+        /* CONTENIDO */
+
+        .contenedor {
+            width: min(1100px, 90%);
+            margin: 42px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 26px;
+        }
+
+        .encabezado h1 {
+            color: var(--vino);
+            font-size: 32px;
+            margin-bottom: 9px;
+        }
+
+        .encabezado p {
+            color: var(--gris);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* DISTRIBUCIÓN */
+
+        .contenido {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 350px;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .formulario,
+        .resumen {
+            background: var(--blanco);
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            padding: 25px;
+            min-width: 0;
+        }
+
+        .formulario h2,
+        .resumen h2 {
+            color: var(--vino);
+            font-size: 20px;
+            margin-bottom: 23px;
+        }
+
+        /* CAMPOS */
+
+        .campo {
+            margin-bottom: 20px;
+        }
+
+        .campo label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 9px;
+        }
+
+        .campo input,
+        .campo textarea {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            padding: 13px 14px;
+            border: 1px solid #E5DCE0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            color: var(--texto);
+            background: white;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .campo input {
+            min-height: 48px;
+        }
+
+        .campo input:focus,
+        .campo textarea:focus {
+            outline: none;
+            border-color: var(--vino);
+            box-shadow: 0 0 0 3px rgba(112, 30, 50, .08);
+        }
+
+        .campo input::placeholder,
+        .campo textarea::placeholder {
+            color: #999094;
+        }
+
+        .campo textarea {
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.5;
+        }
+
+        /* BOTÓN */
+
+        .boton-enviar {
+            width: 100%;
+            min-height: 50px;
+            padding: 15px;
+            margin-top: 7px;
+            border: none;
+            border-radius: 8px;
+            background: var(--vino);
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .boton-enviar:hover {
+            background: var(--vino-oscuro);
+            transform: translateY(-1px);
+        }
+
+        .volver {
+            display: inline-block;
+            margin-top: 21px;
+            color: var(--vino);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .volver:hover {
+            text-decoration: underline;
+        }
+
+        /* RESUMEN */
+
+        .producto {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--borde);
+            font-size: 13px;
+        }
+
+        .producto-info {
+            min-width: 0;
+        }
+
+        .producto-info strong {
+            color: var(--vino);
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .producto-info p {
+            color: var(--gris);
+            margin-top: 3px;
+        }
+
+        .producto-precio {
+            color: var(--vino);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .fila-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid var(--borde);
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .fila-total strong {
+            color: var(--vino);
+            white-space: nowrap;
+        }
+
+        .nota {
+            background: #F7F1E7;
+            color: #755A2B;
+            padding: 15px;
+            border-radius: 9px;
+            font-size: 12px;
+            line-height: 1.7;
+            margin-top: 21px;
+        }
+
+        /* MENSAJES */
+
+        .mensaje {
+            padding: 13px 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            background: #F8E9E9;
+            color: var(--rojo);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* TABLETS */
+
+        @media (max-width: 850px) {
+            .contenido {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 18px;
+            }
+
+            .resumen {
+                width: 100%;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+
+        /* CELULARES */
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+                padding: 17px 5%;
+            }
+
+            .marca {
+                font-size: 21px;
+            }
+
+            header nav {
+                width: 100%;
+                gap: 20px;
+            }
+
+            header a {
+                font-size: 13px;
+            }
+
+            .contenedor {
+                width: 92%;
+                margin: 27px auto;
+            }
+
+            .encabezado {
+                margin-bottom: 20px;
+            }
+
+            .encabezado h1 {
+                font-size: 27px;
+            }
+
+            .encabezado p {
+                font-size: 13px;
+            }
+
+            .contenido {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 17px;
+            }
+
+            .formulario,
+            .resumen {
+                padding: 19px;
+                border-radius: 12px;
+            }
+
+            .formulario h2,
+            .resumen h2 {
+                font-size: 19px;
+                margin-bottom: 20px;
+            }
+
+            .campo {
+                margin-bottom: 18px;
+            }
+
+            .campo label {
+                font-size: 13px;
+            }
+
+            .campo input,
+            .campo textarea {
+                font-size: 16px;
+                padding: 13px;
+            }
+
+            .campo input {
+                min-height: 49px;
+            }
+
+            .campo textarea {
+                min-height: 105px;
+            }
+
+            .boton-enviar {
+                min-height: 52px;
+                font-size: 15px;
+                margin-top: 5px;
+            }
+
+            .producto {
+                gap: 10px;
+                padding: 13px 0;
+                font-size: 12px;
+            }
+
+            .producto-info strong {
+                line-height: 1.5;
+            }
+
+            .producto-precio {
+                font-size: 12px;
+            }
+
+            .fila-total {
+                font-size: 17px;
+            }
+
+            .nota {
+                padding: 13px;
+                font-size: 12px;
+            }
+        }
+
+        /* CELULARES PEQUEÑOS */
+
+        @media (max-width: 360px) {
+            .contenedor {
+                width: 94%;
+            }
+
+            .formulario,
+            .resumen {
+                padding: 15px;
+            }
+
+            .encabezado h1 {
+                font-size: 25px;
+            }
+
+            header nav {
+                gap: 15px;
+            }
+
+            .producto {
+                gap: 7px;
+            }
+
+            .producto-precio {
+                font-size: 11px;
+            }
+
+            .fila-total {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="marca">
+        Licorería <span>Homero</span>
+    </div>
+
+    <nav>
+        <a href="{% url 'publico:inicio' %}">Inicio</a>
+        <a href="{% url 'publico:catalogo' %}">Catálogo</a>
+        <a href="{% url 'publico:carrito' %}">Mi carrito</a>
+    </nav>
+
+</header>
+
+<main class="contenedor">
+
+    <div class="encabezado">
+        <h1>Finalizar pedido</h1>
+        <p>Completa tus datos para que podamos comunicarnos contigo.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mensaje">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="contenido">
+
+        <!-- FORMULARIO DEL CLIENTE -->
+
+        <section class="formulario">
+
+            <h2>Datos del cliente</h2>
+
+            <form method="POST" action="{% url 'publico:crear_pedido' %}">
+
+                {% csrf_token %}
+
+                <div class="campo">
+                    <label for="nombre_cliente">Nombre completo *</label>
+
+                    <input
+                        type="text"
+                        id="nombre_cliente"
+                        name="nombre_cliente"
+                        maxlength="150"
+                        value="{{ nombre_cliente }}"
+                        placeholder="Ingresa tu nombre completo"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">Número de teléfono *</label>
+
+                    <input
+                        type="tel"
+                        id="telefono"
+                        name="telefono"
+                        maxlength="30"
+                        value="{{ telefono }}"
+                        placeholder="Ej. 70000000"
+                        autocomplete="tel"
+                        inputmode="tel"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="direccion">Dirección de entrega *</label>
+
+                    <input
+                        type="text"
+                        id="direccion"
+                        name="direccion"
+                        maxlength="250"
+                        value="{{ direccion }}"
+                        placeholder="Barrio, calle y número"
+                        autocomplete="street-address"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="observaciones">
+                        Observaciones (opcional)
+                    </label>
+
+                    <textarea
+                        id="observaciones"
+                        name="observaciones"
+                        placeholder="Alguna indicación adicional..."
+                    >{{ observaciones }}</textarea>
+                </div>
+
+                <button type="submit" class="boton-enviar">
+                    Enviar mi pedido
+                </button>
+
+            </form>
+
+            <a href="{% url 'publico:carrito' %}" class="volver">
+                ← Volver al carrito
+            </a>
+
+        </section>
+
+        <!-- RESUMEN DEL PEDIDO -->
+
+        <aside class="resumen">
+
+            <h2>Resumen de tu pedido</h2>
+
+            {% for item in productos_carrito %}
+
+                <div class="producto">
+
+                    <div class="producto-info">
+                        <strong>{{ item.producto.nombre }}</strong>
+                        <p>Cantidad: {{ item.cantidad }}</p>
+                    </div>
+
+                    <strong class="producto-precio">
+                        Bs {{ item.subtotal|floatformat:2 }}
+                    </strong>
+
+                </div>
+
+            {% endfor %}
+
+            <div class="fila-total">
+                <span>Total</span>
+                <strong>Bs {{ total|floatformat:2 }}</strong>
+            </div>
+
+            <div class="nota">
+                Tu pedido será registrado para su revisión.
+                El envío del formulario no significa que la compra
+                esté confirmada.
+            </div>
+
+        </aside>
+
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -176,8 +176,8 @@ def confirmar_venta(venta, usuario):
                 f"Solicitado: {cantidad_total}."
             )
 
-    # Actualizar los importes.
-    calcular_totales(venta)
+    # Actualizar los importes y recuperar la venta actualizada.
+    venta = calcular_totales(venta)
 
     # Registrar las salidas de inventario.
     for detalle in detalles:
