@@ -1,6 +1,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator
 
 
@@ -56,6 +57,12 @@ class Compra(models.Model):
         ordering = ["-fecha"]
         verbose_name = "Compra"
         verbose_name_plural = "Compras"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(total__gte=0),
+                name="compra_total_no_neg",
+            ),
+        ]
 
     def __str__(self):
         return f"Compra #{self.pk} - {self.proveedor.nombre}"
@@ -96,6 +103,16 @@ class DetalleCompra(models.Model):
         db_table = "detalles_compra"
         verbose_name = "Detalle de compra"
         verbose_name_plural = "Detalles de compra"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(costo_unitario__gte=0),
+                name="detcomp_costo_no_neg",
+            ),
+            models.CheckConstraint(
+                condition=Q(subtotal__gte=0),
+                name="detcomp_subtotal_no_neg",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} unidades"

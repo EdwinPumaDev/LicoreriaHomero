@@ -1,6 +1,5 @@
 
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -106,13 +105,13 @@
             padding: 18px;
             background: #faf8f7;
             border-radius: 9px;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
             overflow-wrap: anywhere;
         }
 
         .datos p {
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
             margin-bottom: 10px;
         }
 
@@ -132,25 +131,45 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
             max-width: 100%;
         }
 
         .boton {
             display: block;
             width: 100%;
-            background: #701e32;
-            color: white;
             padding: 15px;
             border-radius: 8px;
             text-decoration: none;
             font-size: 14px;
             font-weight: bold;
             transition: .2s;
+            margin-top: 12px;
         }
 
-        .boton:hover {
+        .boton-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .boton-whatsapp:hover {
+            background: #1da851;
+        }
+
+        .boton-catalogo {
+            background: #701e32;
+            color: white;
+        }
+
+        .boton-catalogo:hover {
             background: #4b1423;
+        }
+
+        .nota {
+            color: #81777b;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 17px;
         }
 
         footer {
@@ -210,10 +229,6 @@
                 line-height: 1.5;
             }
 
-            .boton {
-                padding: 15px 10px;
-            }
-
             footer {
                 padding: 17px 12px;
                 line-height: 1.5;
@@ -247,16 +262,15 @@
 
         <section class="confirmacion">
 
-            <div class="icono">
-                ✓
-            </div>
+            <div class="icono">✓</div>
 
             <h1>¡Pedido recibido!</h1>
 
             <p class="descripcion">
                 Gracias por elegir Licorería Homero.
-                Hemos recibido tu pedido y nuestro personal
-                lo revisará para ponerse en contacto contigo.
+                Tu pedido fue registrado correctamente.
+                Ahora puedes enviarnos los detalles por WhatsApp
+                para que nuestro personal pueda revisarlo.
             </p>
 
             <div class="numero-pedido">
@@ -277,9 +291,21 @@
                 </p>
 
                 <p>
+                    <strong>Dirección:</strong>
+                    {{ pedido.direccion }}
+                </p>
+
+                <p>
                     <strong>Total:</strong>
                     Bs {{ pedido.total|floatformat:2 }}
                 </p>
+
+                {% if pedido.observaciones %}
+                    <p>
+                        <strong>Observaciones:</strong>
+                        {{ pedido.observaciones }}
+                    </p>
+                {% endif %}
 
             </div>
 
@@ -287,7 +313,26 @@
                 PEDIDO PENDIENTE DE REVISIÓN
             </div>
 
-            <a href="{% url 'publico:catalogo' %}" class="boton">
+            <a
+                href="#"
+                id="botonWhatsApp"
+                class="boton boton-whatsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                📱 Enviar pedido por WhatsApp
+            </a>
+
+            <p class="nota">
+                Al pulsar el botón se abrirá WhatsApp con los detalles
+                de tu pedido. Revisa el mensaje y pulsa Enviar.
+                El pedido seguirá pendiente hasta que el negocio lo revise.
+            </p>
+
+            <a
+                href="{% url 'publico:catalogo' %}"
+                class="boton boton-catalogo"
+            >
                 Volver al catálogo
             </a>
 
@@ -295,9 +340,56 @@
 
     </main>
 
+    <!-- MENSAJE DEL PEDIDO -->
+
+    <textarea id="mensajePedido" hidden>{% autoescape on %}
+*NUEVO PEDIDO - LICORERÍA HOMERO*
+
+Número de pedido: #{{ pedido.id }}
+Cliente: {{ pedido.nombre_cliente }}
+Teléfono: {{ pedido.telefono }}
+Dirección: {{ pedido.direccion }}
+
+*PRODUCTOS:*
+{% for detalle in pedido.detalles.all %}
+- {{ detalle.producto.nombre }} | Cantidad: {{ detalle.cantidad }} | Bs {{ detalle.subtotal|floatformat:2 }}
+{% endfor %}
+*TOTAL: Bs {{ pedido.total|floatformat:2 }}*
+
+{% if pedido.observaciones %}
+Observaciones: {{ pedido.observaciones }}
+{% endif %}
+
+Estado: Pendiente de revisión.
+Solicito confirmar la disponibilidad y entrega de mi pedido.
+{% endautoescape %}</textarea>
+
     <footer>
         © 2026 Licorería Homero. Todos los derechos reservados.
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const numeroWhatsApp = "59173666286";
+
+            const campoMensaje = document.getElementById("mensajePedido");
+            const botonWhatsApp = document.getElementById("botonWhatsApp");
+
+            if (!campoMensaje || !botonWhatsApp) {
+                console.error("No se encontraron los elementos de WhatsApp.");
+                return;
+            }
+
+            const mensaje = campoMensaje.value.trim();
+
+            const enlace = "https://wa.me/" + numeroWhatsApp
+                + "?text=" + encodeURIComponent(mensaje);
+
+            botonWhatsApp.href = enlace;
+
+        });
+    </script>
 
 </body>
 </html>

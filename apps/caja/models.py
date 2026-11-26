@@ -1,6 +1,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator
 
 
@@ -79,6 +80,12 @@ class IngresoCaja(models.Model):
         ordering = ["-fecha"]
         verbose_name = "Ingreso de caja"
         verbose_name_plural = "Ingresos de caja"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(monto__gte=0),
+                name="ingreso_monto_no_neg",
+            ),
+        ]
 
     def __str__(self):
         estado = "Anulado" if self.anulado else "Válido"

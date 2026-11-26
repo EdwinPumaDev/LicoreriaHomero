@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator
 
 
@@ -142,6 +143,24 @@ class Producto(models.Model):
         ordering = ["nombre"]
         verbose_name = "Producto"
         verbose_name_plural = "Productos"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(costo__gte=0),
+                name="producto_costo_no_neg",
+            ),
+            models.CheckConstraint(
+                condition=Q(precio_venta__gte=0),
+                name="producto_precio_no_neg",
+            ),
+            models.CheckConstraint(
+                condition=Q(stock__gte=0),
+                name="producto_stock_no_neg",
+            ),
+            models.CheckConstraint(
+                condition=Q(stock_minimo__gte=0),
+                name="producto_stockmin_no_neg",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"

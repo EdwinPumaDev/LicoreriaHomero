@@ -1,6 +1,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator
 
 
@@ -72,6 +73,20 @@ class MovimientoInventario(models.Model):
         ordering = ["-fecha"]
         verbose_name = "Movimiento de inventario"
         verbose_name_plural = "Movimientos de inventario"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(cantidad__gte=1),
+                name="inv_cantidad_min_1",
+            ),
+            models.CheckConstraint(
+                condition=Q(stock_anterior__gte=0),
+                name="inv_stock_ant_no_neg",
+            ),
+            models.CheckConstraint(
+                condition=Q(stock_posterior__gte=0),
+                name="inv_stock_post_no_neg",
+            ),
+        ]
 
     def __str__(self):
         return (
